@@ -442,7 +442,7 @@
             const googleFormUrl = 'https://docs.google.com/forms/d/e/1FAIpQLSdqE5WjDsqPAunywvT0-EFu25Ry_sPK1YSpmMbOjcAdTaAqUw/formResponse';
 
             const googleFormEntryIds = {
-                // YOUR EXACT GOOGLE FORM ENTRY IDs GO HERE
+                // YOUR EXACT GOOGLE FORM ENTRY IDS GO HERE
                 'order-type': '179603497',
                 'order-description': '1454604303',
                 'deadline': '198757871',
@@ -457,15 +457,26 @@
             const formData = new FormData(orderForm);
             let params = new URLSearchParams();
 
+            console.log('--- Debugging Form Data ---');
+            // Log all entries from formData before processing
             for (let [key, value] of formData.entries()) {
+                console.log(`FormData entry: key='${key}', value='${value}'`);
                 // Only include fields that have a corresponding Google Form entry ID
                 if (googleFormEntryIds.hasOwnProperty(key)) {
                     params.append(googleFormEntryIds[key], value);
+                    console.log(`  -> Appending to params: Google ID='${googleFormEntryIds[key]}', Value='${value}'`);
+                } else {
+                    console.warn(`  -> Skipping: No Google Form ID found for key: '${key}' (or HTML input "name" attribute mismatch)`);
                 }
             }
+            console.log('--- End Debugging Form Data ---');
+
+            // Log the URLSearchParams object as a string
+            console.log('URLSearchParams object (as string):', params.toString());
 
             // Construct the full submission URL
             const submissionUrl = `${googleFormUrl}?${params.toString()}`;
+            console.log('Final Submission URL:', submissionUrl); // Log the full URL before fetching
 
             try {
                 // Using 'no-cors' mode is necessary for submitting to Google Forms directly from a custom page.
