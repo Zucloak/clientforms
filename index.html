@@ -290,7 +290,7 @@
             </button>
         </div>
 
-        <form id="order-form" class="hidden opacity-0 translate-y-4" method="GET" target="hidden_iframe">
+        <form id="order-form" class="hidden opacity-0 translate-y-4" method="GET" target="hidden_iframe" onsubmit="handleFormSubmission(event)">
             <h1 class="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-500 mb-6 text-center drop-shadow-lg">
                 Store of Zu Order Request
             </h1>
@@ -374,7 +374,32 @@
             const proceedButton = document.getElementById('proceed-button');
 
             // Only trigger after the form has actually been submitted by the user
-            if (orderForm.dataset.submitted) {
+            // Check if the iframe content is from Google Forms confirmation page
+            // This is a more robust check for successful submission
+            try {
+                // Accessing contentDocument might throw a CORS error if the iframe content is cross-origin
+                // This is expected for Google Forms, but we can still check if it loaded
+                if (hiddenIframe.contentDocument && hiddenIframe.contentDocument.body.innerHTML.includes('Your response has been recorded')) {
+                    console.log('Google Forms confirmation page detected in iframe.');
+                    // Proceed with success message and UI reset
+                } else if (orderForm.dataset.submitted) {
+                    // Fallback if confirmation message isn't directly accessible due to CORS,
+                    // but we know a submission was attempted.
+                    console.log('Iframe loaded, but Google Forms confirmation not directly accessible. Assuming submission attempted.');
+                } else {
+                    // This is the initial load of the iframe, do nothing.
+                    return;
+                }
+            } catch (e) {
+                console.warn('Could not access iframe content due to CORS, assuming submission attempted:', e);
+                if (!orderForm.dataset.submitted) {
+                    // If not submitted, it's just initial load, do nothing.
+                    return;
+                }
+            }
+
+
+            if (orderForm.dataset.submitted) { // Proceed if a submission was initiated
                 showMessageBox('Order Submitted!', 'Thank you for your order request! Your data has been sent to our records. We will review it and get back to you shortly.');
 
                 // Reset form and revert UI
@@ -409,6 +434,8 @@
         const messageBoxClose = document.getElementById('message-box-close');
         const hiddenIframe = document.getElementById('hidden_iframe'); // Get reference to the iframe
 
+        // Add event listener for iframe load after the iframeLoaded function is defined
+        hiddenIframe.addEventListener('load', iframeLoaded);
 
         function showMessageBox(title, content) {
             messageBoxTitle.textContent = title;
@@ -448,9 +475,6 @@
                 showMessageBox('Agreement Required', 'Please agree to the Data Privacy Agreement and Terms & Conditions to proceed.');
             }
         });
-
-        // Add event listener for iframe load after the iframeLoaded function is defined
-        hiddenIframe.addEventListener('load', iframeLoaded);
 
 
         // Handle form submission
@@ -498,23 +522,34 @@
             for (let i = 0; i < orderForm.elements.length; i++) {
                 const element = orderForm.elements[i];
                 // Only process elements that have a name and a value
+                // and ensure it's a field we want to send to Google Forms
                 if (element.name && element.value && googleFormEntryIds.hasOwnProperty(element.name)) {
-                    params.append(googleFormEntryIds[element.name], element.value);
+                    // Create a hidden input for each field to be submitted via the native form
+                    // This is necessary because we are building the URL manually and then submitting the form.
+                    // The native form submission will only send inputs that have a 'name' attribute.
+                    // We need to map our friendly 'name' (e.g., 'order-type') to Google's 'entry.ID'.
+                    const hiddenInput = document.createElement('input');
+                    hiddenInput.type = 'hidden';
+                    hiddenInput.name = googleFormEntryIds[element.name]; // Google's entry ID
+                    hiddenInput.value = element.value;
+                    orderForm.appendChild(hiddenInput); // Add to the form
                 }
             }
 
-            // Construct the full submission URL
-            const submissionUrl = `${googleFormUrl}?${params.toString()}`;
-            console.log('IFRAME Submission URL:', submissionUrl); // Log the full URL before submitting
-
             // Set the form's action and submit it
-            orderForm.action = submissionUrl;
+            orderForm.action = googleFormUrl; // Set the action to the base Google Forms URL
             orderForm.dataset.submitted = 'true'; // Set a flag to indicate submission
             console.log('Attempting to submit form to iframe...'); // Debugging log
             orderForm.submit(); // Submit the form to the hidden iframe
             console.log('Form submission initiated.'); // Debugging log
 
             // The iframeLoaded() function will handle the success message and UI reset
+            // Clean up the dynamically added hidden inputs after a short delay
+            setTimeout(() => {
+                const hiddenInputs = orderForm.querySelectorAll('input[type="hidden"]');
+                hiddenInputs.forEach(input => input.remove());
+                console.log('Cleaned up hidden inputs.');
+            }, 1000); // Give a moment for submission to register
         }
     </script>
 </body>
