@@ -432,70 +432,66 @@
                 return;
             }
 
-            // --- Google Forms Integration Logic (Reverted to Fetch API) ---
-            const googleFormUrl = 'https://docs.google.com/forms/d/e/1FAIpQLSdqE5WjDsqPAunywvT0-EFu25Ry_sPK1YSpmMbOjcAdTaAqUw/formResponse';
-
-            const googleFormEntryIds = {
-                'order-type': '179603497',
-                'order-description': '1454604303',
-                'deadline': '198757871',
-                'full-name': '1946373970',
-                'email': '5421469',
-                'phone': '461974431',
-                'facebook': '1091644645',
-                'instagram': '403080227',
-                'twitter': '1795554807'
+            // Prepare data to send to Apps Script
+            const dataToSend = {
+                'order-type': document.getElementById('order-type').value,
+                'order-description': document.getElementById('order-description').value,
+                'deadline': document.getElementById('deadline').value,
+                'full-name': document.getElementById('full-name').value,
+                'email': document.getElementById('email').value,
+                'phone': document.getElementById('phone').value,
+                'facebook': document.getElementById('facebook').value,
+                'instagram': document.getElementById('instagram').value,
+                'twitter': document.getElementById('twitter').value
             };
 
-            const formData = new FormData(orderForm);
-            let params = new URLSearchParams();
+            console.log('Data to send to Apps Script:', dataToSend);
 
-            console.log('--- Debugging Form Data ---');
-            for (let [key, value] of formData.entries()) {
-                console.log(`FormData entry: key='${key}', value='${value}'`);
-                if (googleFormEntryIds.hasOwnProperty(key)) {
-                    params.append(googleFormEntryIds[key], value);
-                    console.log(`  -> Appending to params: Google ID='${googleFormEntryIds[key]}', Value='${value}'`);
-                } else {
-                    console.warn(`  -> Skipping: No Google Form ID found for key: '${key}' (or HTML input "name" attribute mismatch)`);
-                }
-            }
-            console.log('--- End Debugging Form Data ---');
-
-            console.log('URLSearchParams object (as string):', params.toString());
-
-            const submissionUrl = `${googleFormUrl}?${params.toString()}`;
-            console.log('Final Submission URL:', submissionUrl);
+            // IMPORTANT: This is the URL for your deployed Google Apps Script Web App
+            const appsScriptWebAppUrl = 'https://script.google.com/macros/s/AKfycbwm7lw4hWiAmrDGmMckYOX_IucxwlHFp7WHCbmyiJxXJDPhzrsTDAmhwmlY7LyuzKTc/exec'; 
 
             try {
-                // Using 'no-cors' mode is necessary for submitting to Google Forms directly from a custom page.
-                await fetch(submissionUrl, {
-                    method: 'GET', // Google Forms expects GET for this type of submission
-                    mode: 'no-cors'
+                const response = await fetch(appsScriptWebAppUrl, {
+                    method: 'POST',
+                    mode: 'cors', // Use 'cors' mode when sending data across origins
+                    headers: {
+                        'Content-Type': 'application/json' // Tell the Apps Script we're sending JSON
+                    },
+                    body: JSON.stringify(dataToSend) // Send data as a JSON string
                 });
 
-                showMessageBox('Order Submitted!', 'Thank you for your order request! Your data has been sent to our records. We will review it and get back to you shortly.');
+                if (response.ok) { // Check if the response status is 2xx (e.g., 200 OK)
+                    const responseText = await response.text();
+                    console.log('Apps Script response:', responseText);
+                    showMessageBox('Order Submitted!', 'Thank you for your order request! Your data has been sent.');
 
-                orderForm.reset();
-                agreeDpaCheckbox.checked = false;
-                proceedButton.disabled = true;
-                proceedButton.classList.add('opacity-50', 'cursor-not-allowed');
-                proceedButton.classList.remove('hover:scale-105');
+                    // Reset form and revert UI
+                    orderForm.reset();
+                    agreeDpaCheckbox.checked = false;
+                    proceedButton.disabled = true;
+                    proceedButton.classList.add('opacity-50', 'cursor-not-allowed');
+                    proceedButton.classList.remove('hover:scale-105');
 
-                setTimeout(() => {
-                    orderForm.classList.add('opacity-0', 'translate-y-4');
                     setTimeout(() => {
-                        orderForm.classList.add('hidden');
-                        dpaSection.classList.remove('hidden');
+                        orderForm.classList.add('opacity-0', 'translate-y-4');
                         setTimeout(() => {
-                            dpaSection.classList.remove('opacity-0', 'scale-95');
-                        }, 50);
-                    }, 400);
-                }, 2000);
+                            orderForm.classList.add('hidden');
+                            dpaSection.classList.remove('hidden');
+                            setTimeout(() => {
+                                dpaSection.classList.remove('opacity-0', 'scale-95');
+                            }, 50);
+                        }, 400);
+                    }, 2000); // Show success message for 2 seconds before reverting
+
+                } else {
+                    const errorText = await response.text();
+                    console.error('Error from Apps Script:', response.status, errorText);
+                    showMessageBox('Submission Failed', 'There was an issue submitting your order to the backend. Please try again or contact support. Error: ' + errorText);
+                }
 
             } catch (error) {
-                console.error('Error submitting to Google Form:', error);
-                showMessageBox('Submission Failed', 'There was an issue submitting your order. Please try again or contact support.');
+                console.error('Network or Fetch Error:', error);
+                showMessageBox('Submission Failed', 'A network error occurred. Please check your internet connection and try again.');
             }
         }
     </script>
