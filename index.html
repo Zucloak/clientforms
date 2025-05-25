@@ -290,7 +290,7 @@
             </button>
         </div>
 
-        <form id="order-form" class="hidden opacity-0 translate-y-4" onsubmit="handleFormSubmission(event)">
+        <form id="order-form" class="hidden opacity-0 translate-y-4" method="GET" target="hidden_iframe">
             <h1 class="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-500 mb-6 text-center drop-shadow-lg">
                 Store of Zu Order Request
             </h1>
@@ -361,7 +361,44 @@
 
     </div>
 
+    <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;"></iframe>
+
     <script>
+        // Define iframeLoaded function first to ensure it's available
+        function iframeLoaded() {
+            const orderForm = document.getElementById('order-form');
+            const messageBox = document.getElementById('message-box');
+            const messageBoxTitle = document.getElementById('message-box-title');
+            const messageBoxContent = document.getElementById('message-box-content');
+            const agreeDpaCheckbox = document.getElementById('agree-dpa');
+            const proceedButton = document.getElementById('proceed-button');
+
+            // Only trigger after the form has actually been submitted by the user
+            if (orderForm.dataset.submitted) {
+                showMessageBox('Order Submitted!', 'Thank you for your order request! Your data has been sent to our records. We will review it and get back to you shortly.');
+
+                // Reset form and revert UI
+                orderForm.reset();
+                delete orderForm.dataset.submitted; // Clear the flag
+                agreeDpaCheckbox.checked = false;
+                proceedButton.disabled = true;
+                proceedButton.classList.add('opacity-50', 'cursor-not-allowed');
+                proceedButton.classList.remove('hover:scale-105');
+
+                setTimeout(() => {
+                    orderForm.classList.add('opacity-0', 'translate-y-4');
+                    setTimeout(() => {
+                        orderForm.classList.add('hidden');
+                        dpaSection.classList.remove('hidden');
+                        setTimeout(() => {
+                            dpaSection.classList.remove('opacity-0', 'scale-95');
+                        }, 50);
+                    }, 400);
+                }, 2000); // Show success message for 2 seconds before reverting
+            }
+        }
+
+        // Get elements after iframeLoaded is defined
         const agreeDpaCheckbox = document.getElementById('agree-dpa');
         const proceedButton = document.getElementById('proceed-button');
         const dpaSection = document.getElementById('dpa-section');
@@ -370,23 +407,21 @@
         const messageBoxTitle = document.getElementById('message-box-title');
         const messageBoxContent = document.getElementById('message-box-content');
         const messageBoxClose = document.getElementById('message-box-close');
+        const hiddenIframe = document.getElementById('hidden_iframe'); // Get reference to the iframe
 
-        // Function to show custom message box
+
         function showMessageBox(title, content) {
             messageBoxTitle.textContent = title;
             messageBoxContent.textContent = content;
             messageBox.classList.remove('hidden');
         }
 
-        // Function to hide custom message box
         function hideMessageBox() {
             messageBox.classList.add('hidden');
         }
 
-        // Event listener for closing the message box
         messageBoxClose.addEventListener('click', hideMessageBox);
 
-        // Enable/Disable Proceed button based on checkbox state
         agreeDpaCheckbox.addEventListener('change', function() {
             if (this.checked) {
                 proceedButton.disabled = false;
@@ -399,27 +434,28 @@
             }
         });
 
-        // Handle Proceed button click
         proceedButton.addEventListener('click', function() {
             if (agreeDpaCheckbox.checked) {
-                // Hide DPA section with animation
                 dpaSection.classList.add('opacity-0', 'scale-95');
                 setTimeout(() => {
                     dpaSection.classList.add('hidden');
-                    // Show form with animation
                     orderForm.classList.remove('hidden');
                     setTimeout(() => {
                         orderForm.classList.remove('opacity-0', 'translate-y-4');
-                    }, 50); // Small delay to ensure hidden is applied first
-                }, 400); // Increased transition duration
+                    }, 50);
+                }, 400);
             } else {
                 showMessageBox('Agreement Required', 'Please agree to the Data Privacy Agreement and Terms & Conditions to proceed.');
             }
         });
 
+        // Add event listener for iframe load after the iframeLoaded function is defined
+        hiddenIframe.addEventListener('load', iframeLoaded);
+
+
         // Handle form submission
         async function handleFormSubmission(event) {
-            event.preventDefault(); // Prevent default form submission
+            event.preventDefault(); // Prevent default form submission initially
 
             // Basic client-side validation
             const requiredFields = orderForm.querySelectorAll('[required]');
@@ -438,7 +474,7 @@
                 return;
             }
 
-            // --- Google Forms Integration Logic ---
+            // --- Google Forms Integration Logic for IFRAME submission ---
             const googleFormUrl = 'https://docs.google.com/forms/d/e/1FAIpQLSdqE5WjDsqPAunywvT0-EFu25Ry_sPK1YSpmMbOjcAdTaAqUw/formResponse';
 
             const googleFormEntryIds = {
@@ -454,63 +490,28 @@
                 'twitter': '1795554807'
             };
 
-            const formData = new FormData(orderForm);
             let params = new URLSearchParams();
 
-            console.log('--- Debugging Form Data ---');
-            // Log all entries from formData before processing
-            for (let [key, value] of formData.entries()) {
-                console.log(`FormData entry: key='${key}', value='${value}'`);
-                // Only include fields that have a corresponding Google Form entry ID
-                if (googleFormEntryIds.hasOwnProperty(key)) {
-                    params.append(googleFormEntryIds[key], value);
-                    console.log(`  -> Appending to params: Google ID='${googleFormEntryIds[key]}', Value='${value}'`);
-                } else {
-                    console.warn(`  -> Skipping: No Google Form ID found for key: '${key}' (or HTML input "name" attribute mismatch)`);
+            // Loop through form elements directly to build parameters
+            // Using orderForm.elements to get all form controls
+            for (let i = 0; i < orderForm.elements.length; i++) {
+                const element = orderForm.elements[i];
+                // Only process elements that have a name and a value
+                if (element.name && element.value && googleFormEntryIds.hasOwnProperty(element.name)) {
+                    params.append(googleFormEntryIds[element.name], element.value);
                 }
             }
-            console.log('--- End Debugging Form Data ---');
-
-            // Log the URLSearchParams object as a string
-            console.log('URLSearchParams object (as string):', params.toString());
 
             // Construct the full submission URL
             const submissionUrl = `${googleFormUrl}?${params.toString()}`;
-            console.log('Final Submission URL:', submissionUrl); // Log the full URL before fetching
+            console.log('IFRAME Submission URL:', submissionUrl); // Log the full URL before submitting
 
-            try {
-                // Using 'no-cors' mode is necessary for submitting to Google Forms directly from a custom page.
-                // Note: With 'no-cors', you won't receive a direct success/failure response from Google Forms.
-                // You rely on the request being sent successfully.
-                await fetch(submissionUrl, {
-                    method: 'GET', // Google Forms expects GET for this type of submission
-                    mode: 'no-cors'
-                });
+            // Set the form's action and submit it
+            orderForm.action = submissionUrl;
+            orderForm.dataset.submitted = 'true'; // Set a flag to indicate submission
+            orderForm.submit(); // Submit the form to the hidden iframe
 
-                showMessageBox('Order Submitted!', 'Thank you for your order request! Your data has been sent to our records. We will review it and get back to you shortly.');
-
-                // Reset form and return to DPA section after successful submission
-                orderForm.reset();
-                agreeDpaCheckbox.checked = false;
-                proceedButton.disabled = true;
-                proceedButton.classList.add('opacity-50', 'cursor-not-allowed');
-                proceedButton.classList.remove('hover:scale-105');
-
-                setTimeout(() => {
-                    orderForm.classList.add('opacity-0', 'translate-y-4');
-                    setTimeout(() => {
-                        orderForm.classList.add('hidden');
-                        dpaSection.classList.remove('hidden');
-                        setTimeout(() => {
-                            dpaSection.classList.remove('opacity-0', 'scale-95');
-                        }, 50);
-                    }, 400); // Match transition duration
-                }, 2000); // Show success message for 2 seconds before reverting
-
-            } catch (error) {
-                console.error('Error submitting to Google Form:', error);
-                showMessageBox('Submission Failed', 'There was an issue submitting your order. Please try again or contact support.');
-            }
+            // The iframeLoaded() function will handle the success message and UI reset
         }
     </script>
 </body>
