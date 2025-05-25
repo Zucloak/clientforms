@@ -455,6 +455,7 @@
 
         // Handle form submission
         async function handleFormSubmission(event) {
+            console.log('handleFormSubmission called'); // Debugging log
             event.preventDefault(); // Prevent default form submission initially
 
             // Basic client-side validation
@@ -509,7 +510,9 @@
             // Set the form's action and submit it
             orderForm.action = submissionUrl;
             orderForm.dataset.submitted = 'true'; // Set a flag to indicate submission
+            console.log('Attempting to submit form to iframe...'); // Debugging log
             orderForm.submit(); // Submit the form to the hidden iframe
+            console.log('Form submission initiated.'); // Debugging log
 
             // The iframeLoaded() function will handle the success message and UI reset
         }
