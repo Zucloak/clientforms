@@ -34,7 +34,7 @@
             align-items: flex-start; /* Align to top for longer forms */
             min-height: 100vh;
             /* === MODIFIED FOR MOBILE OPTIMIZATION === */
-            padding: 2rem 1rem; /* Smaller padding for very small screens (32px top/bottom, 16px left/right) */
+            padding: 1.5rem 0.75rem; /* Reduced padding for very small screens (24px top/bottom, 12px left/right) */
             /* === END MODIFICATION === */
             box-sizing: border-box;
         }
@@ -57,7 +57,7 @@
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 10px 20px -5px rgba(0, 0, 0, 0.1); /* More prominent shadow */
             overflow: hidden;
             /* === MODIFIED FOR MOBILE OPTIMIZATION === */
-            padding: 1.5rem; /* Base padding for small screens (24px all around) */
+            padding: 1.25rem; /* Reduced base padding for small screens (20px all around) */
             /* === END MODIFICATION === */
             border: 1px solid #2d3748; /* Subtle border */
         }
@@ -104,13 +104,27 @@
         }
 
         .section-title {
-            font-size: 2rem; /* Larger font size */
+            /* === MODIFIED FOR MOBILE OPTIMIZATION === */
+            font-size: 1.5rem; /* Smaller base font size for mobile (24px) */
+            /* === END MODIFICATION === */
             font-weight: 600; /* Semibold */
             color: #e2e8f0; /* Ensure good contrast */
             margin-bottom: 1.5rem; /* Adjusted margin */
             border-bottom: 2px solid #3b82f6; /* Blue accent line */
             padding-bottom: 0.75rem;
         }
+        /* === NEW MEDIA QUERIES FOR SECTION TITLE FONT SIZE === */
+        @media (min-width: 640px) { /* sm breakpoint */
+            .section-title {
+                font-size: 2rem; /* Original size for small screens and up */
+            }
+        }
+        @media (min-width: 768px) { /* md breakpoint */
+            .section-title {
+                font-size: 2rem; /* Remains 2rem for md */
+            }
+        }
+        /* === END NEW MEDIA QUERIES === */
 
         .form-group {
             margin-bottom: 1.75rem; /* Increased margin */
@@ -242,7 +256,7 @@
             </button>
         </div>
 
-        <form id="order-form" class="hidden opacity-0 translate-y-4" action="https://formspree.io/f/yourFormId" method="POST">
+        <form id="order-form" class="hidden opacity-0 translate-y-4" action="https://formspree.io/f/mqabzjvl" method="POST">
             <h1 class="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-500 mb-6 text-center drop-shadow-lg">
                 Store of Zu Order Request
             </h1>
