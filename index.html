@@ -33,20 +33,17 @@
             justify-content: center;
             align-items: flex-start; /* Align to top for longer forms */
             min-height: 100vh;
-            /* === MODIFIED FOR MOBILE OPTIMIZATION === */
-            padding: 1.5rem 0.5rem; /* Further reduced padding for very small screens (24px top/bottom, 8px left/right) */
-            /* === END MODIFICATION === */
+            /* Default padding for mobile-first approach */
+            padding: 1.5rem 0.5rem; /* 24px top/bottom, 8px left/right */
             box-sizing: border-box;
         }
 
-        /* === NEW MEDIA QUERY FOR BODY PADDING === */
+        /* Adjust body padding for small screens and up */
         @media (min-width: 640px) { /* sm breakpoint */
             body {
                 padding: 2.5rem 1.5rem; /* Original padding for small screens and up */
             }
         }
-        /* === END NEW MEDIA QUERY === */
-
 
         .form-container {
             position: relative;
@@ -56,20 +53,17 @@
             border-radius: 1rem; /* More rounded corners */
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 10px 20px -5px rgba(0, 0, 0, 0.1); /* More prominent shadow */
             overflow: hidden;
-            /* === MODIFIED FOR MOBILE OPTIMIZATION === */
-            padding: 1rem; /* Further reduced base padding for small screens (16px all around) */
-            /* === END MODIFICATION === */
+            /* Default padding for mobile-first approach */
+            padding: 1rem; /* 16px all around */
             border: 1px solid #2d3748; /* Subtle border */
         }
 
-        /* === NEW MEDIA QUERY FOR FORM CONTAINER PADDING === */
+        /* Adjust form container padding for medium screens and up */
         @media (min-width: 768px) { /* md breakpoint */
             .form-container {
                 padding: 2rem; /* Original padding for medium screens and up */
             }
         }
-        /* === END NEW MEDIA QUERY === */
-
 
         .form-header-gradient {
             position: absolute;
@@ -81,60 +75,49 @@
             z-index: 0;
         }
 
-        #dpa-section {
+        #dpa-section,
+        #order-form { /* Apply common styles to both sections */
             position: relative;
             z-index: 10;
-            /* === MODIFIED FOR MOBILE OPTIMIZATION === */
-            padding: 1.5rem; /* Reduced padding for mobile */
-            /* === END MODIFICATION === */
+            /* Default padding for mobile-first approach */
+            padding: 1.5rem; /* 24px all around */
             background-color: #242b38; /* Darker blue-gray for sections */
             border-radius: 0.75rem; /* More rounded */
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* More pronounced inner shadow */
             transition: all 0.4s ease-in-out; /* Smoother transition */
             border: 1px solid #374151; /* Clearer border */
         }
-        /* === NEW MEDIA QUERY FOR DPA SECTION PADDING === */
+
+        /* Adjust section padding for small screens and up */
         @media (min-width: 640px) { /* sm breakpoint */
-            #dpa-section {
+            #dpa-section,
+            #order-form {
                 padding: 2rem; /* Original padding for small screens and up */
             }
         }
-        /* === END NEW MEDIA QUERY === */
-
-
-        #order-form {
-            position: relative;
-            z-index: 10;
-            padding: 2rem; /* Adjusted padding */
-            background-color: #242b38; /* Darker blue-gray for sections */
-            border-radius: 0.75rem; /* More rounded */
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* More pronounced inner shadow */
-            transition: all 0.4s ease-in-out; /* Smoother transition */
-            border: 1px solid #374151; /* Clearer border */
-        }
 
         .section-title {
-            /* === MODIFIED FOR MOBILE OPTIMIZATION === */
-            font-size: 1.375rem; /* Even smaller base font size for mobile (22px) */
-            /* === END MODIFICATION === */
+            /* Default font size for mobile-first approach */
+            font-size: 1.375rem; /* 22px */
             font-weight: 600; /* Semibold */
             color: #e2e8f0; /* Ensure good contrast */
             margin-bottom: 1.5rem; /* Adjusted margin */
             border-bottom: 2px solid #3b82f6; /* Blue accent line */
             padding-bottom: 0.75rem;
         }
-        /* === NEW MEDIA QUERIES FOR SECTION TITLE FONT SIZE === */
+
+        /* Adjust section title font size for small screens and up */
         @media (min-width: 640px) { /* sm breakpoint */
             .section-title {
-                font-size: 1.75rem; /* Slightly larger for small screens (28px) */
+                font-size: 1.75rem; /* 28px */
             }
         }
+        /* Adjust section title font size for medium screens and up */
         @media (min-width: 768px) { /* md breakpoint */
             .section-title {
                 font-size: 2rem; /* Original size for medium screens and up */
             }
         }
-        /* === END NEW MEDIA QUERIES === */
 
         .form-group {
             margin-bottom: 1.75rem; /* Increased margin */
@@ -188,7 +171,6 @@
             ring-offset-color: #1a202c;
             ring-color: #3b82f6;
         }
-
 
         .agree-label {
             margin-left: 0.75rem; /* Adjusted margin */
