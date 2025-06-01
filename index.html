@@ -36,6 +36,11 @@
             /* Default padding for mobile-first approach */
             padding: 1.5rem 0.5rem; /* 24px top/bottom, 8px left/right */
             box-sizing: border-box;
+            /* Disable text selection */
+            -webkit-user-select: none; /* Safari */
+            -moz-user-select: none; /* Firefox */
+            -ms-user-select: none; /* IE 10+ */
+            user-select: none; /* Standard syntax */
         }
 
         /* Adjust body padding for small screens and up */
@@ -49,19 +54,14 @@
             position: relative;
             width: 100%;
             max-width: 48rem; /* Increased max-width for a slightly wider form */
-            background-color: #1a202c; /* Slightly lighter than body, but still dark */
-            border-radius: 1rem; /* More rounded corners */
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 10px 20px -5px rgba(0, 0, 0, 0.1); /* More prominent shadow */
-            overflow: hidden;
-            /* Default padding for mobile-first approach */
-            padding: 1rem; /* 16px all around */
-            border: 1px solid #2d3748; /* Subtle border */
+            /* Removed background-color, border-radius, box-shadow, overflow, padding, and border */
+            /* These styles are now applied to individual sections or are part of the body background */
         }
 
         /* Adjust form container padding for medium screens and up */
         @media (min-width: 768px) { /* md breakpoint */
             .form-container {
-                padding: 2rem; /* Original padding for medium screens and up */
+                /* No padding here as it's now handled by body or individual sections */
             }
         }
 
@@ -73,6 +73,7 @@
             height: 24px; /* Taller gradient */
             background: linear-gradient(to right, #3b82f6, #6366f1); /* Blue to indigo gradient for a more "techy" feel */
             z-index: 0;
+            border-radius: 1rem 1rem 0 0; /* Apply border-radius only to the top of the gradient */
         }
 
         #dpa-section { /* DPA section retains its styles including border */
@@ -85,6 +86,7 @@
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* More pronounced inner shadow */
             transition: all 0.4s ease-in-out; /* Smoother transition */
             border: 1px solid #374151; /* Clearer border */
+            margin-bottom: 2rem; /* Add margin below DPA section */
         }
 
         /* Adjust section padding for small screens and up */
@@ -94,10 +96,8 @@
             }
         }
 
-        /* Order form sections will now have no explicit border */
-        #order-form .p-4.bg-gray-800\/50.rounded-md.shadow-inner {
-            border: none; /* Remove border from the inner sections of the order form */
-        }
+        /* Order form sections will now have no explicit border or distinct background */
+        /* The individual form sections will rely on the body background */
 
 
         .section-title {
@@ -228,8 +228,6 @@
 </head>
 <body class="antialiased">
     <div class="form-container">
-        <div class="form-header-gradient"></div>
-
         <div id="dpa-section" class="opacity-100 scale-100">
             <h2 class="text-2xl md:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-500 mb-6 text-center">Data Privacy Agreement</h2>
             <p class="text-gray-300 mb-4 leading-relaxed text-sm md:text-base">
@@ -257,7 +255,7 @@
                 Store of Zu Order Request
             </h1>
 
-            <div class="mb-6 p-4 bg-gray-800/50 rounded-md shadow-inner">
+            <div class="mb-6">
                 <h2 class="section-title">Order Details</h2>
                 <div class="form-group">
                     <label for="order-type" class="form-label">Type of Order <span class="text-red-400">*</span></label>
@@ -273,7 +271,7 @@
                 </div>
             </div>
 
-            <div class="mb-6 p-4 bg-gray-800/50 rounded-md shadow-inner">
+            <div class="mb-6">
                 <h2 class="section-title">Client Information</h2>
                 <div class="form-group">
                     <label for="full-name" class="form-label">Full Name <span class="text-red-400">*</span></label>
@@ -289,7 +287,7 @@
                 </div>
             </div>
 
-            <div class="mb-6 p-4 bg-gray-800/50 rounded-md shadow-inner">
+            <div class="mb-6">
                 <h2 class="section-title">Social Media & Links <span class="text-gray-400 text-sm">(Optional)</span></h2>
                 <p class="text-gray-400 text-sm mb-2">Provide links or usernames to help us understand your brand or connect with you.</p>
                 <div class="form-group">
@@ -372,13 +370,22 @@
             }
         });
 
-        // With Formspree, you don't need a custom JavaScript submission handler.
-        // The form's 'action' and 'method' attributes handle the submission directly.
-        // Formspree redirects to a thank you page by default, or you can configure a custom redirect URL.
-        // The message box for submission success/failure is no longer needed for Formspree.
-        // If you want a custom success message without redirect, you'd use their AJAX feature:
-        // https://formspree.io/forms/f/{your-form-id}/settings/integrations/ajax
-        // For simplicity, we'll let Formspree handle the redirect.
+        // Code Protection: Disable right-click and common copy shortcuts
+        document.addEventListener('contextmenu', event => event.preventDefault()); // Disable right-click
+
+        document.addEventListener('keydown', event => {
+            // Disable Ctrl+C, Ctrl+X, Ctrl+A, Ctrl+U, F12 (for Windows/Linux)
+            // Disable Cmd+C, Cmd+X, Cmd+A, Cmd+U, Option+Cmd+I (for Mac)
+            if ((event.ctrlKey || event.metaKey) && ['c', 'x', 'a', 'u'].includes(event.key.toLowerCase())) {
+                event.preventDefault();
+            }
+            if (event.key === 'F12' || (event.metaKey && event.altKey && event.key === 'i')) { // F12 and Option+Cmd+I for dev tools
+                event.preventDefault();
+            }
+        });
+
+        // Disable text selection using CSS (already added to body style)
+        // body { -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; }
     </script>
 </body>
 </html>
