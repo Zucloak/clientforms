@@ -75,8 +75,7 @@
             z-index: 0;
         }
 
-        #dpa-section,
-        #order-form { /* Apply common styles to both sections */
+        #dpa-section { /* DPA section retains its styles including border */
             position: relative;
             z-index: 10;
             /* Default padding for mobile-first approach */
@@ -90,11 +89,16 @@
 
         /* Adjust section padding for small screens and up */
         @media (min-width: 640px) { /* sm breakpoint */
-            #dpa-section,
-            #order-form {
+            #dpa-section {
                 padding: 2rem; /* Original padding for small screens and up */
             }
         }
+
+        /* Order form sections will now have no explicit border */
+        #order-form .p-4.bg-gray-800\/50.rounded-md.shadow-inner {
+            border: none; /* Remove border from the inner sections of the order form */
+        }
+
 
         .section-title {
             /* Default font size for mobile-first approach */
@@ -253,7 +257,7 @@
                 Store of Zu Order Request
             </h1>
 
-            <div class="mb-6 p-4 bg-gray-800/50 rounded-md border border-gray-700 shadow-inner">
+            <div class="mb-6 p-4 bg-gray-800/50 rounded-md shadow-inner">
                 <h2 class="section-title">Order Details</h2>
                 <div class="form-group">
                     <label for="order-type" class="form-label">Type of Order <span class="text-red-400">*</span></label>
@@ -269,7 +273,7 @@
                 </div>
             </div>
 
-            <div class="mb-6 p-4 bg-gray-800/50 rounded-md border border-gray-700 shadow-inner">
+            <div class="mb-6 p-4 bg-gray-800/50 rounded-md shadow-inner">
                 <h2 class="section-title">Client Information</h2>
                 <div class="form-group">
                     <label for="full-name" class="form-label">Full Name <span class="text-red-400">*</span></label>
@@ -285,7 +289,7 @@
                 </div>
             </div>
 
-            <div class="mb-6 p-4 bg-gray-800/50 rounded-md border border-gray-700 shadow-inner">
+            <div class="mb-6 p-4 bg-gray-800/50 rounded-md shadow-inner">
                 <h2 class="section-title">Social Media & Links <span class="text-gray-400 text-sm">(Optional)</span></h2>
                 <p class="text-gray-400 text-sm mb-2">Provide links or usernames to help us understand your brand or connect with you.</p>
                 <div class="form-group">
