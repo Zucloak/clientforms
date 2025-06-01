@@ -188,79 +188,9 @@
             box-shadow: none;
         }
 
+        /* Message box styles are mostly removed as Formspree handles redirect */
         #message-box {
-            position: fixed;
-            inset: 0;
-            background-color: rgba(0, 0, 0, 0.85); /* Darker overlay */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 50;
-            opacity: 0; /* Start hidden for animation */
-            transition: opacity 0.3s ease-in-out;
-            pointer-events: none; /* Allow clicks through when hidden */
-        }
-        #message-box.hidden {
-            opacity: 0;
-            pointer-events: none;
-        }
-        #message-box:not(.hidden) {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-
-        .message-box-content {
-            background-color: #2d3748; /* Darker background */
-            padding: 2.5rem; /* Increased padding */
-            border-radius: 0.75rem; /* More rounded */
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.25), 0 10px 10px -5px rgba(0, 0, 0, 0.1); /* Stronger shadow */
-            max-width: 28rem; /* Adjusted max-width */
-            width: 100%;
-            text-align: center;
-            border: 1px solid #4a5568; /* More defined border */
-            transform: translateY(-20px); /* Start slightly above for animation */
-            opacity: 0; /* Start hidden for animation */
-            transition: all 0.3s ease-out;
-        }
-        #message-box:not(.hidden) .message-box-content {
-            transform: translateY(0);
-            opacity: 1;
-        }
-
-        .message-box-title {
-            font-size: 1.75rem; /* Larger title */
-            font-weight: 700; /* Bold */
-            color: #93c5fd; /* Even lighter blue for title */
-            margin-bottom: 1.25rem; /* Adjusted margin */
-        }
-
-        .message-box-text {
-            color: #d1d5db;
-            margin-bottom: 1.75rem; /* Adjusted margin */
-            line-height: 1.6; /* Better readability */
-        }
-
-        .message-box-close-button {
-            padding: 0.75rem 1.5rem; /* Adjusted padding */
-            background: linear-gradient(to right, #3b82f6, #2563eb);
-            color: #f9fafb;
-            font-weight: 600;
-            border-radius: 0.5rem;
-            transition: all 0.2s ease-in-out;
-            outline: none;
-            border: none;
-            cursor: pointer;
-        }
-
-        .message-box-close-button:hover {
-            background: linear-gradient(to right, #60a5fa, #3b82f6);
-            transform: translateY(-1px);
-        }
-
-        .message-box-close-button:active {
-            background: linear-gradient(to right, #2563eb, #1d4ed8);
-            transform: translateY(0);
+            display: none; /* Hide the message box for Formspree */
         }
     </style>
 </head>
@@ -290,7 +220,7 @@
             </button>
         </div>
 
-        <form id="order-form" class="hidden opacity-0 translate-y-4" onsubmit="handleFormSubmission(event)">
+        <form id="order-form" class="hidden opacity-0 translate-y-4" action="https://formspree.io/f/mqabzjvl" method="POST">
             <h1 class="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-500 mb-6 text-center drop-shadow-lg">
                 Store of Zu Order Request
             </h1>
@@ -299,15 +229,15 @@
                 <h2 class="section-title">Order Details</h2>
                 <div class="form-group">
                     <label for="order-type" class="form-label">Type of Order <span class="text-red-400">*</span></label>
-                    <input type="text" id="order-type" name="order-type" required class="form-input" placeholder="e.g., Custom Illustration, Website Design, Video Editing">
+                    <input type="text" id="order-type" name="Order Type" required class="form-input" placeholder="e.g., Custom Illustration, Website Design, Video Editing">
                 </div>
                 <div class="form-group">
                     <label for="order-description" class="form-label">Detailed Description <span class="text-red-400">*</span></label>
-                    <textarea id="order-description" name="order-description" rows="4" required class="form-textarea" placeholder="Please provide as much detail as possible about your project, including specific requirements, desired outcomes, and any reference materials."></textarea>
+                    <textarea id="order-description" name="Description" rows="4" required class="form-textarea" placeholder="Please provide as much detail as possible about your project, including specific requirements, desired outcomes, and any reference materials."></textarea>
                 </div>
                 <div class="form-group">
                     <label for="deadline" class="form-label">Preferred Deadline</label>
-                    <input type="date" id="deadline" name="deadline" class="form-input">
+                    <input type="date" id="deadline" name="Deadline" class="form-input">
                 </div>
             </div>
 
@@ -315,15 +245,15 @@
                 <h2 class="section-title">Client Information</h2>
                 <div class="form-group">
                     <label for="full-name" class="form-label">Full Name <span class="text-red-400">*</span></label>
-                    <input type="text" id="full-name" name="full-name" required class="form-input" placeholder="John Doe">
+                    <input type="text" id="full-name" name="Full Name" required class="form-input" placeholder="John Doe">
                 </div>
                 <div class="form-group">
                     <label for="email" class="form-label">Email Address <span class="text-red-400">*</span></label>
-                    <input type="email" id="email" name="email" required class="form-input" placeholder="your.email@example.com">
+                    <input type="email" id="email" name="Email" required class="form-input" placeholder="your.email@example.com">
                 </div>
                 <div class="form-group">
                     <label for="phone" class="form-label">Phone Number <span class="text-red-400">*</span></label>
-                    <input type="tel" id="phone" name="phone" required class="form-input" placeholder="+63 9XX XXX XXXX">
+                    <input type="tel" id="phone" name="Phone Number" required class="form-input" placeholder="+63 9XX XXX XXXX">
                 </div>
             </div>
 
@@ -332,15 +262,15 @@
                 <p class="text-gray-400 text-sm mb-2">Provide links or usernames to help us understand your brand or connect with you.</p>
                 <div class="form-group">
                     <label for="facebook" class="form-label">Facebook Profile/Page</label>
-                    <input type="text" id="facebook" name="facebook" class="form-input" placeholder="https://facebook.com/yourpage or @yourusername">
+                    <input type="text" id="facebook" name="Facebook Profile" class="form-input" placeholder="https://facebook.com/yourpage or @yourusername">
                 </div>
                 <div class="form-group">
                     <label for="instagram" class="form-label">Instagram Handle</label>
-                    <input type="text" id="instagram" name="instagram" class="form-input" placeholder="@yourinstagram">
+                    <input type="text" id="instagram" name="Instagram Handle" class="form-input" placeholder="@yourinstagram">
                 </div>
                 <div class="form-group">
                     <label for="twitter" class="form-label">Twitter/X Handle</label>
-                    <input type="text" id="twitter" name="twitter" class="form-input" placeholder="@yourtwitter">
+                    <input type="text" id="twitter" name="Twitter Handle" class="form-input" placeholder="@yourtwitter">
                 </div>
             </div>
 
@@ -366,7 +296,7 @@
         const proceedButton = document.getElementById('proceed-button');
         const dpaSection = document.getElementById('dpa-section');
         const orderForm = document.getElementById('order-form');
-        const messageBox = document.getElementById('message-box');
+        const messageBox = document.getElementById('message-box'); // Kept for DPA message
         const messageBoxTitle = document.getElementById('message-box-title');
         const messageBoxContent = document.getElementById('message-box-content');
         const messageBoxClose = document.getElementById('message-box-close');
@@ -410,90 +340,13 @@
             }
         });
 
-        // Handle form submission
-        async function handleFormSubmission(event) {
-            console.log('handleFormSubmission called'); // Debugging log
-            event.preventDefault(); // Prevent default form submission initially
-
-            // Basic client-side validation
-            const requiredFields = orderForm.querySelectorAll('[required]');
-            let allFieldsValid = true;
-            requiredFields.forEach(field => {
-                if (!field.value.trim()) {
-                    field.classList.add('border-red-500'); // Highlight empty required fields
-                    allFieldsValid = false;
-                } else {
-                    field.classList.remove('border-red-500');
-                }
-            });
-
-            if (!allFieldsValid) {
-                showMessageBox('Missing Information', 'Please fill in all required fields before submitting.');
-                return;
-            }
-
-            // Prepare data to send to Apps Script
-            const dataToSend = {
-                'order-type': document.getElementById('order-type').value,
-                'order-description': document.getElementById('order-description').value,
-                'deadline': document.getElementById('deadline').value,
-                'full-name': document.getElementById('full-name').value,
-                'email': document.getElementById('email').value,
-                'phone': document.getElementById('phone').value,
-                'facebook': document.getElementById('facebook').value,
-                'instagram': document.getElementById('instagram').value,
-                'twitter': document.getElementById('twitter').value
-            };
-
-            console.log('Data to send to Apps Script:', dataToSend);
-
-            // IMPORTANT: This is the URL for your deployed Google Apps Script Web App
-            const appsScriptWebAppUrl = 'https://script.google.com/macros/s/AKfycbzkLMfbpvgI-7Dds5vM0FA2f4R1OxiQvimk8W0QPPUpNYUQRTq8PIQybGXaba1TgNU0/exec'; 
-
-            try {
-                const response = await fetch(appsScriptWebAppUrl, {
-                    method: 'POST',
-                    mode: 'cors', // Use 'cors' mode when sending data across origins
-                    headers: {
-                        'Content-Type': 'application/json' // Tell the Apps Script we're sending JSON
-                    },
-                    body: JSON.stringify(dataToSend) // Send data as a JSON string
-                });
-
-                if (response.ok) { // Check if the response status is 2xx (e.g., 200 OK)
-                    const responseText = await response.text();
-                    console.log('Apps Script response:', responseText);
-                    showMessageBox('Order Submitted!', 'Thank you for your order request! Your data has been sent.');
-
-                    // Reset form and revert UI
-                    orderForm.reset();
-                    agreeDpaCheckbox.checked = false;
-                    proceedButton.disabled = true;
-                    proceedButton.classList.add('opacity-50', 'cursor-not-allowed');
-                    proceedButton.classList.remove('hover:scale-105');
-
-                    setTimeout(() => {
-                        orderForm.classList.add('opacity-0', 'translate-y-4');
-                        setTimeout(() => {
-                            orderForm.classList.add('hidden');
-                            dpaSection.classList.remove('hidden');
-                            setTimeout(() => {
-                                dpaSection.classList.remove('opacity-0', 'scale-95');
-                            }, 50);
-                        }, 400);
-                    }, 2000); // Show success message for 2 seconds before reverting
-
-                } else {
-                    const errorText = await response.text();
-                    console.error('Error from Apps Script:', response.status, errorText);
-                    showMessageBox('Submission Failed', 'There was an issue submitting your order to the backend. Please try again or contact support. Error: ' + errorText);
-                }
-
-            } catch (error) {
-                console.error('Network or Fetch Error:', error);
-                showMessageBox('Submission Failed', 'A network error occurred. Please check your internet connection and try again.');
-            }
-        }
+        // With Formspree, you don't need a custom JavaScript submission handler.
+        // The form's 'action' and 'method' attributes handle the submission directly.
+        // Formspree redirects to a thank you page by default, or you can configure a custom redirect URL.
+        // The message box for submission success/failure is no longer needed for Formspree.
+        // If you want a custom success message without redirect, you'd use their AJAX feature:
+        // https://formspree.io/forms/f/{your-form-id}/settings/integrations/ajax
+        // For simplicity, we'll let Formspree handle the redirect.
     </script>
 </body>
 </html>
