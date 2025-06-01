@@ -3,968 +3,350 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SYNAPSE by Store of Zu</title>
+    <title>Client Order Form - Store of Zu</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        /*
-         * Jony Ive: "This brand is about elegance and efficiency. Every element must serve a purpose and be stripped of anything superfluous.
-         * The animations should feel fluid and intentional, not distracting. White space is our friend."
-         * Dieter Rams: "Functionality first. The visual story must be clear and intuitive. The user should always know where they are and what they can do."
-         * Luke Wroblewski: "Mobile-first, always. The layout needs to adapt gracefully. Touch targets must be generous."
-         */
-
-        :root {
-            --primary-color: #6A0DAD; /* Deep Purple */
-            --secondary-color: #FFD700; /* Gold */
-            --accent-color: #00FFFF; /* Cyan */
-            --text-dark: #1a1a1a;
-            --text-light: #f0f0f0;
-            --bg-light: #ffffff;
-            --bg-dark: #0a0a0a;
-            --gradient-start: #6A0DAD; /* Purple */
-            --gradient-end: #4B0082; /* Indigo */
+        /* Custom scrollbar for a sleeker look */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
         }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
+        ::-webkit-scrollbar-track {
+            background: #374151; /* Darker gray for track */
+            border-radius: 10px;
         }
-
-        html {
-            scroll-behavior: smooth;
+        ::-webkit-scrollbar-thumb {
+            background: #4b5563; /* Medium gray for thumb */
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6b7280; /* Lighter gray on hover */
         }
 
         body {
             font-family: 'Inter', sans-serif;
-            color: var(--text-dark);
-            background-color: var(--bg-light);
-            line-height: 1.6;
-            overflow-x: hidden; /* Prevent horizontal scroll */
-        }
-
-        /* Typography */
-        h1, h2, h3, h4, h5, h6 {
-            font-weight: 700;
-            margin-bottom: 0.5em;
-            color: var(--text-dark);
-        }
-
-        h1 { font-size: 3.5em; }
-        h2 { font-size: 2.5em; }
-        h3 { font-size: 1.8em; }
-        p { font-size: 1.1em; margin-bottom: 1em; }
-
-        /* Links & Buttons */
-        a {
-            color: var(--primary-color);
-            text-decoration: none;
-            transition: color 0.3s ease;
-        }
-        a:hover {
-            color: var(--secondary-color);
-        }
-
-        .btn {
-            display: inline-block;
-            padding: 0.8em 1.8em;
-            background: linear-gradient(45deg, var(--primary-color), var(--gradient-end));
-            color: var(--text-light);
-            border-radius: 50px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
-        .btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-        }
-
-        /* Sections */
-        section {
-            padding: 80px 5%;
-            min-height: 100vh;
+            background-color: #0d0f1a; /* Even darker charcoal background */
+            background-image: radial-gradient(at 50% 0%, #1a202c 0%, #0d0f1a 70%); /* Subtle radial gradient from top */
+            color: #e5e7eb; /* Light gray text */
             display: flex;
-            flex-direction: column;
             justify-content: center;
-            align-items: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .container {
-            max-width: 1200px;
-            width: 100%;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        /* --- Hero Section --- */
-        /* Julie Zhuo: "The 'empty front page' indicates a lack of immediate impact; the gradient and refined intro will address this." */
-        #hero {
-            background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
-            color: var(--text-light);
-            text-align: center;
-            position: relative;
-            overflow: hidden;
+            align-items: flex-start; /* Align to top for longer forms */
             min-height: 100vh;
+            padding: 2.5rem 1.5rem; /* Increased padding for mobile view */
+            box-sizing: border-box;
         }
 
-        #hero::before {
-            content: '';
+        .form-container {
+            position: relative;
+            width: 100%;
+            max-width: 48rem; /* Increased max-width for a slightly wider form */
+            background-color: #1a202c; /* Slightly lighter than body, but still dark */
+            border-radius: 1rem; /* More rounded corners */
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 10px 20px -5px rgba(0, 0, 0, 0.1); /* More prominent shadow */
+            overflow: hidden;
+            padding: 2rem; /* Increased overall padding */
+            border: 1px solid #2d3748; /* Subtle border */
+        }
+
+        .form-header-gradient {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at top left, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
-            z-index: 1;
-        }
-        #hero::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            right: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at bottom right, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
-            z-index: 1;
+            height: 24px; /* Taller gradient */
+            background: linear-gradient(to right, #3b82f6, #6366f1); /* Blue to indigo gradient for a more "techy" feel */
+            z-index: 0;
         }
 
-        #hero .container {
+        #dpa-section {
             position: relative;
-            z-index: 2;
+            z-index: 10;
+            padding: 2rem; /* Adjusted padding */
+            background-color: #242b38; /* Darker blue-gray for sections */
+            border-radius: 0.75rem; /* More rounded */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* More pronounced inner shadow */
+            transition: all 0.4s ease-in-out; /* Smoother transition */
+            border: 1px solid #374151; /* Clearer border */
         }
 
-        #hero h1 {
-            font-size: 5em;
-            margin-bottom: 0.2em;
-            color: var(--text-light);
-            opacity: 0; /* For animation */
-            transform: translateY(20px); /* For animation */
-        }
-
-        #hero p {
-            font-size: 1.5em;
-            margin-bottom: 2em;
-            color: rgba(255, 255, 255, 0.8);
-            opacity: 0; /* For animation */
-            transform: translateY(20px); /* For animation */
-        }
-
-        /* --- Services Section --- */
-        /* Dieter Rams: "The 'grey box' sounds like a distraction; let's integrate the background or remove it entirely if it doesn't add value." */
-        /* Jakob Nielsen: "The 'previews in the middle' is a good usability point; central alignment often feels more stable." */
-        #services {
-            background-color: var(--bg-light);
-            color: var(--text-dark);
-            text-align: center;
-        }
-
-        #services h2 {
-            margin-bottom: 1.5em;
-            color: var(--primary-color);
-        }
-
-        .services-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 40px;
-            justify-content: center; /* Center the grid items */
-            align-items: stretch;
-            margin-top: 3em;
-        }
-
-        .service-card {
-            background-color: #fff;
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-            text-align: left;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            opacity: 0; /* For animation */
-            transform: translateY(50px); /* For animation */
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            overflow: hidden; /* For inner animations */
-        }
-
-        .service-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
-        }
-
-        .service-card .icon {
-            font-size: 3em;
-            color: var(--primary-color);
-            margin-bottom: 0.5em;
-            transition: color 0.3s ease;
-        }
-
-        .service-card h3 {
-            color: var(--text-dark);
-            margin-bottom: 0.5em;
-        }
-
-        .service-card p {
-            font-size: 1em;
-            color: #555;
-            flex-grow: 1; /* Allow content to push button down */
-        }
-
-        .service-card .preview-placeholder {
-            width: 100%;
-            height: 180px;
-            background-color: #f0f0f0;
-            border-radius: 10px;
-            margin-top: 1em;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: #888;
-            font-style: italic;
-            overflow: hidden; /* For Lottie/Video */
+        #order-form {
             position: relative;
+            z-index: 10;
+            padding: 2rem; /* Adjusted padding */
+            background-color: #242b38; /* Darker blue-gray for sections */
+            border-radius: 0.75rem; /* More rounded */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* More pronounced inner shadow */
+            transition: all 0.4s ease-in-out; /* Smoother transition */
+            border: 1px solid #374151; /* Clearer border */
         }
 
-        .service-card .preview-placeholder img,
-        .service-card .preview-placeholder video,
-        .service-card .preview-placeholder lottie-player {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+        .section-title {
+            font-size: 2rem; /* Larger font size */
+            font-weight: 600; /* Semibold */
+            color: #e2e8f0; /* Ensure good contrast */
+            margin-bottom: 1.5rem; /* Adjusted margin */
+            border-bottom: 2px solid #3b82f6; /* Blue accent line */
+            padding-bottom: 0.75rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.75rem; /* Increased margin */
+        }
+
+        .form-label {
             display: block;
+            color: #cbd5e0; /* Lighter gray label */
+            font-size: 0.9375rem; /* Slightly larger font */
+            font-weight: 500; /* Medium weight */
+            margin-bottom: 0.625rem; /* Adjusted margin */
         }
 
-        /* --- About Section --- */
-        #about {
-            background-color: var(--bg-dark);
-            color: var(--text-light);
-            text-align: center;
-            position: relative;
-        }
-
-        #about h2 {
-            color: var(--secondary-color);
-            margin-bottom: 1em;
-        }
-
-        #about p {
-            max-width: 800px;
-            margin: 0 auto 2em auto;
-            font-size: 1.2em;
-            color: rgba(255, 255, 255, 0.8);
-        }
-
-        .philosophy-points {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 30px;
-            margin-top: 3em;
-        }
-
-        .philosophy-point {
-            background-color: rgba(255, 255, 255, 0.08);
-            border-radius: 15px;
-            padding: 30px;
-            max-width: 350px;
-            text-align: left;
-            transition: transform 0.3s ease, background-color 0.3s ease;
-            opacity: 0; /* For animation */
-            transform: translateY(50px); /* For animation */
-        }
-
-        .philosophy-point:hover {
-            transform: translateY(-5px);
-            background-color: rgba(255, 255, 255, 0.15);
-        }
-
-        .philosophy-point h3 {
-            color: var(--accent-color);
-            margin-bottom: 0.5em;
-        }
-
-        .philosophy-point p {
-            font-size: 1em;
-            color: rgba(255, 255, 255, 0.7);
-        }
-
-        /* --- Achievements Section --- */
-        /* Julie Zhuo: "Building trust is key. Visually presenting achievements reinforces credibility." */
-        /* Chris Do: "The layout for badges should be clean and professional, reflecting the quality of the achievements." */
-        #achievements {
-            background-color: var(--bg-light);
-            color: var(--text-dark);
-            text-align: center;
-        }
-
-        #achievements h2 {
-            margin-bottom: 1.5em;
-            color: var(--primary-color);
-        }
-
-        #achievements p {
-            max-width: 800px;
-            margin: 0 auto 2em auto;
-            font-size: 1.1em;
-            color: #555;
-        }
-
-        .badges-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 30px;
-            justify-content: center;
-            margin-top: 3em;
-        }
-
-        .badge-item {
-            background-color: #fff;
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            opacity: 0; /* For animation */
-            transform: translateY(50px); /* For animation */
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            /* Don Norman: "Ensure consistent vertical alignment for readability and visual stability." */
-            justify-content: flex-start; /* Align content to the top */
-            min-height: 220px; /* Increased min-height to accommodate all text */
-        }
-
-        .badge-item:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.1);
-        }
-
-        .badge-item img {
-            max-width: 100px;
-            height: auto;
-            margin-bottom: 1em;
-        }
-
-        .badge-item h4 {
-            font-size: 1.1em;
-            color: var(--text-dark);
-            margin-bottom: 0.5em;
-        }
-
-        .badge-item p {
-            font-size: 0.9em;
-            color: #777;
-            margin-bottom: 0;
-            /* Dieter Rams: "Good design is thorough to the last detail. Ensure consistent spacing for text blocks." */
-            min-height: 60px; /* Give enough space for 3 lines of text */
-            display: flex; /* Use flex to align text to top within its min-height */
-            align-items: flex-start;
-            text-align: center; /* Center align the text within the paragraph */
-        }
-
-        /* --- Growth Charts Section (now Animated Line) --- */
-        /* Chris Do: "Visualizing growth is powerful storytelling. The charts need to be clear, engaging, and easy to interpret." */
-        /* Don Norman: "Interaction should be intuitive. Hover states should provide immediate, understandable feedback." */
-        #growth-charts {
-            background-color: var(--bg-dark);
-            color: var(--text-light);
-            text-align: center;
-        }
-
-        #growth-charts h2 {
-            color: var(--secondary-color);
-            margin-bottom: 1em;
-        }
-
-        #growth-charts p {
-            max-width: 800px;
-            margin: 0 auto 2em auto;
-            font-size: 1.2em;
-            color: rgba(255, 255, 255, 0.8);
-        }
-
-        .chart-container {
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            margin-top: 3em;
+        .form-input,
+        .form-textarea {
             width: 100%;
-            max-width: 900px;
-            height: 400px; /* Fixed height for the chart area */
-            display: flex;
-            justify-content: center; /* Center horizontally */
-            align-items: center; /* Center vertically */
-            position: relative;
-            overflow: hidden; /* Ensure content doesn't extend beyond bounds */
-            opacity: 0; /* For animation */
-            transform: translateY(50px); /* For animation */
-            /* Removed specific styling for animation, now just a container for text */
-            background-color: rgba(255, 255, 255, 0.08); /* A subtle background for the text box */
-            padding: 30px; /* Re-add padding for text content */
-            text-align: center; /* Center text within the container */
+            padding: 0.875rem; /* Increased padding */
+            background-color: #2d3748; /* Darker gray input */
+            border: 1px solid #4a5568; /* Clearer border */
+            border-radius: 0.5rem; /* More rounded */
+            outline: none;
+            transition: all 0.2s ease-in-out;
+            color: #e2e8f0;
+            font-size: 1rem;
+            placeholder-color: #6b7280;
         }
 
-        /* Removed styles for #bar-animation-wrapper and .bar as the animation is removed */
-
-
-        /* --- CTA Section --- */
-        /* Don Norman: "Simplifying the CTA to a single button reduces cognitive load and directs the user clearly." */
-        #cta {
-            background: linear-gradient(45deg, var(--primary-color), var(--gradient-end));
-            color: var(--text-light);
-            text-align: center;
+        .form-input:focus,
+        .form-textarea:focus {
+            border-color: #3b82f6; /* Blue border on focus */
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.4); /* Blue glow on focus */
         }
 
-        #cta h2 {
-            color: var(--secondary-color);
-            margin-bottom: 1em;
+        .form-textarea {
+            min-height: 8rem; /* Minimum height for textarea */
+            resize: vertical; /* Allow vertical resizing */
         }
 
-        #cta p {
-            font-size: 1.3em;
-            margin-bottom: 2em;
-            color: rgba(255, 255, 255, 0.9);
+        .form-checkbox {
+            height: 1.25rem; /* Increased size */
+            width: 1.25rem; /* Increased size */
+            color: #3b82f6; /* Blue checkbox */
+            background-color: #374151;
+            border: 1px solid #4b5563;
+            border-radius: 0.25rem;
+            transition: all 0.15s ease-in-out;
+        }
+        .form-checkbox:focus {
+            ring: 3px;
+            ring-offset: 2px;
+            ring-offset-color: #1a202c;
+            ring-color: #3b82f6;
         }
 
-        /* Styles for the new CTA button */
-        .cta-button-wrapper {
-            opacity: 0; /* For animation */
-            transform: translateY(50px); /* For animation */
+
+        .agree-label {
+            margin-left: 0.75rem; /* Adjusted margin */
+            color: #d1d5db;
+            font-size: 1rem;
+            cursor: pointer;
+            user-select: none;
         }
 
-        /* --- Footer --- */
-        footer {
-            background-color: var(--bg-dark);
-            color: rgba(255, 255, 255, 0.7);
-            padding: 40px 5%;
-            text-align: center;
-            font-size: 0.9em;
+        .button {
+            width: 100%;
+            padding: 1rem 1.75rem; /* Increased padding */
+            background: linear-gradient(to right, #3b82f6, #2563eb); /* Vibrant blue gradient */
+            color: #f9fafb; /* Off-white text */
+            font-weight: 700; /* Bold */
+            font-size: 1.125rem; /* Larger font size */
+            border-radius: 0.625rem; /* More rounded */
+            box-shadow: 0 8px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1); /* Stronger initial shadow */
+            transition: all 0.3s ease-in-out;
+            transform: translateY(0) scale(1);
+            outline: none;
+            border: none;
+            cursor: pointer;
         }
 
-        footer .social-links a {
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 1.5em;
-            margin: 0 15px;
-            transition: color 0.3s ease;
+        .button:hover {
+            background: linear-gradient(to right, #60a5fa, #3b82f6); /* Lighter gradient on hover */
+            transform: translateY(-2px) scale(1.01); /* Slight lift and scale */
+            box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.3), 0 6px 10px -3px rgba(0, 0, 0, 0.15); /* More dramatic shadow on hover */
         }
 
-        footer .social-links a:hover {
-            color: var(--accent-color);
+        .button:active {
+            background: linear-gradient(to right, #2563eb, #1d4ed8); /* Darker gradient on active */
+            transform: translateY(0) scale(0.99); /* Slight press effect */
+            box-shadow: 0 4px 8px -2px rgba(0, 0, 0, 0.15), 0 2px 4px -1px rgba(0, 0, 0, 0.08);
         }
 
-        footer p {
-            margin-top: 20px;
-            margin-bottom: 0;
+        .button:disabled {
+            background: #4b5563;
+            cursor: not-allowed;
+            opacity: 0.6; /* Reduced opacity */
+            transform: none;
+            box-shadow: none;
         }
 
-        /* --- Responsive Design --- */
-        /* Luke Wroblewski: "Mobile-first, always. The layout needs to adapt gracefully." */
-        @media (max-width: 1024px) {
-            #hero h1 { font-size: 4em; }
-            #hero p { font-size: 1.3em; }
-            h2 { font-size: 2em; }
-            h3 { font-size: 1.5em; }
-            p { font-size: 1em; }
-
-            .services-grid {
-                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-                gap: 30px;
-            }
-
-            .philosophy-points {
-                flex-direction: column;
-                align-items: center;
-            }
-            .philosophy-point {
-                max-width: 90%;
-            }
-
-            .badges-grid {
-                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-                gap: 20px;
-            }
-            .badge-item img {
-                max-width: 80px;
-            }
-
-            .chart-container {
-                height: 350px;
-                padding: 20px; /* Adjusted padding for text content */
-            }
-        }
-
-        @media (max-width: 768px) {
-            section {
-                padding: 60px 5%;
-            }
-            #hero h1 { font-size: 3em; }
-            #hero p { font-size: 1.1em; }
-            .btn { padding: 0.7em 1.5em; font-size: 0.9em; }
-            h2 { font-size: 1.8em; }
-            h3 { font-size: 1.3em; }
-
-            .service-card {
-                padding: 25px;
-            }
-            .service-card .icon {
-                font-size: 2.5em;
-            }
-            .service-card .preview-placeholder {
-                height: 150px;
-            }
-
-            .badge-item {
-                padding: 15px;
-                min-height: 180px; /* Adjusted min-height for smaller screens */
-            }
-            .badge-item img {
-                max-width: 70px;
-            }
-            .badge-item h4 {
-                font-size: 1em;
-            }
-            .badge-item p {
-                font-size: 0.85em;
-                min-height: 50px; /* Adjusted min-height for smaller screens */
-            }
-
-            .chart-container {
-                height: 300px;
-                padding: 20px; /* Adjusted padding for text content */
-            }
-        }
-
-        @media (max-width: 480px) {
-            #hero h1 { font-size: 2.5em; }
-            #hero p { font-size: 1em; }
-            h2 { font-size: 1.5em; }
-            h3 { font-size: 1.2em; }
-            p { font-size: 0.95em; }
-
-            .services-grid {
-                grid-template-columns: 1fr; /* Single column on very small screens */
-            }
-            .service-card {
-                text-align: center;
-            }
-            .service-card .icon {
-                margin: 0 auto 0.5em auto; /* Center icon */
-            }
-
-            .badges-grid {
-                grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-                gap: 15px;
-            }
-            .badge-item img {
-                max-width: 60px;
-            }
-            .badge-item h4 {
-                font-size: 0.9em;
-            }
-
-            footer .social-links a {
-                font-size: 1.2em;
-                margin: 0 10px;
-            }
-
-            .chart-container {
-                height: 250px;
-                padding: 15px; /* Adjusted padding for text content */
-            }
+        /* Message box styles are mostly removed as Formspree handles redirect */
+        #message-box {
+            display: none; /* Hide the message box for Formspree */
         }
     </style>
 </head>
-<body>
+<body class="antialiased">
+    <div class="form-container">
+        <div class="form-header-gradient"></div>
 
-    <section id="hero">
-        <div class="container">
-            <h1 class="brand-name">SYNAPSE</h1>
-            <p class="tagline">Elegant. Efficient. Emotionally Compelling Digital Assets.</p>
-            <a href="#services" class="btn explore-btn">Explore Our Craft</a>
-        </div>
-    </section>
-
-    <section id="services">
-        <div class="container">
-            <h2>What We Craft</h2>
-            <p>At SYNAPSE, we bridge imagination with digital reality. Our services are tailored to elevate your presence and connect with your audience.</p>
-
-            <div class="services-grid">
-                <div class="service-card" data-service-id="personal-websites">
-                    <i class="fas fa-globe icon"></i>
-                    <h3>Personal Static Websites</h3>
-                    <p>Clean, fast, and secure online presence for individuals. Perfect for personal branding or simple informational sites.</p>
-                    <div class="preview-placeholder">
-                        <img src="https://placehold.co/400x180/6A0DAD/FFFFFF?text=Website+Preview" alt="Personal Website Preview">
-                    </div>
-                </div>
-
-                <div class="service-card" data-service-id="professional-portfolios">
-                    <i class="fas fa-briefcase icon"></i>
-                    <h3>Professional Portfolios</h3>
-                    <p>Showcase your work with a bespoke digital portfolio designed to impress and convert.</p>
-                    <div class="preview-placeholder">
-                        <img src="https://placehold.co/400x180/FFD700/1a1a1a?text=Portfolio+Preview" alt="Portfolio Preview">
-                    </div>
-                </div>
-
-                <div class="service-card" data-service-id="social-media-designs">
-                    <i class="fas fa-share-alt icon"></i>
-                    <h3>Social Media Posting Designs</h3>
-                    <p>Visually striking graphics and animations to make your social media content stand out.</p>
-                    <div class="preview-placeholder">
-                        <img src="https://placehold.co/400x180/00FFFF/1a1a1a?text=Social+Post+Preview" alt="Social Media Post Preview">
-                    </div>
-                </div>
-
-                <div class="service-card" data-service-id="birthday-sites">
-                    <i class="fas fa-birthday-cake icon"></i>
-                    <h3>Customized Birthday Sites</h3>
-                    <p>A unique, interactive digital experience to celebrate special birthdays for loved ones.</p>
-                    <div class="preview-placeholder">
-                        <img src="https://placehold.co/400x180/4B0082/FFFFFF?text=Birthday+Site+Preview" alt="Birthday Site Preview">
-                    </div>
-                </div>
-
-                <div class="service-card" data-service-id="gamified-reviews">
-                    <i class="fas fa-gamepad icon"></i>
-                    <h3>Gamified Review Materials</h3>
-                    <p>Engaging static or interactive games to make learning and review fun and effective.</p>
-                    <div class="preview-placeholder">
-                        <img src="https://placehold.co/400x180/6A0DAD/FFFFFF?text=Gamified+Preview" alt="Gamified Review Preview">
-                    </div>
-                </div>
-
-                <div class="service-card" data-service-id="business-logos">
-                    <i class="fas fa-lightbulb icon"></i>
-                    <h3>Business Logos</h3>
-                    <p>Crafting memorable and impactful logos that encapsulate your brand's essence and vision.</p>
-                    <div class="preview-placeholder">
-                        <img src="https://placehold.co/400x180/FFD700/1a1a1a?text=Logo+Design+Preview" alt="Logo Design Preview">
-                    </div>
-                </div>
-
-                <div class="service-card" data-service-id="website-gifts">
-                    <i class="fas fa-gift icon"></i>
-                    <h3>"Website Gift" Portfolios</h3>
-                    <p>A unique and heartfelt digital gift: a static portfolio for loved ones to cherish their memories.</p>
-                    <div class="preview-placeholder">
-                        <img src="https://placehold.co/400x180/00FFFF/1a1a1a?text=Gift+Site+Preview" alt="Website Gift Preview">
-                    </div>
-                </div>
-
-                <div class="service-card" data-service-id="3d-models">
-                    <i class="fas fa-cube icon"></i>
-                    <h3>3D Product Models</h3>
-                    <p>Immersive 3D models with embedded previews, bringing your products to life in the digital space.</p>
-                    <div class="preview-placeholder">
-                        <p>3D Model Preview (Lottie/Video)</p>
-                    </div>
-                </div>
-
-                <div class="service-card" data-service-id="animated-group-sites">
-                    <i class="fas fa-users icon"></i>
-                    <h3>Animated Group Websites</h3>
-                    <p>Dynamic and engaging websites for online communities, gaming clans, or special interest groups.</p>
-                    <div class="preview-placeholder">
-                        <p>Animated Website Preview (Lottie/Video)</p>
-                    </div>
-                </div>
-
-                <div class="service-card" data-service-id="countdown-calendars">
-                    <i class="fas fa-calendar-alt icon"></i>
-                    <h3>Static Countdown Calendars</h3>
-                    <p>Elegant countdowns for birthdays, product launches, events, or any special occasion.</p>
-                    <div class="preview-placeholder">
-                        <img src="https://placehold.co/400x180/4B0082/FFFFFF?text=Countdown+Preview" alt="Countdown Calendar Preview">
-                    </div>
-                </div>
-
-                <div class="service-card" data-service-id="ai-integration">
-                    <i class="fas fa-robot icon"></i>
-                    <h3>Social Media AI-Integration</h3>
-                    <p>Leverage AI for content generation, analytics, and automation to supercharge your social presence.</p>
-                    <div class="preview-placeholder">
-                        <p>AI Integration Demo (Lottie/Video)</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="about">
-        <div class="container">
-            <h2>Our Philosophy: The SYNAPSE Ethos</h2>
-            <p>At SYNAPSE, we believe in crafting digital experiences that are not just functional, but profoundly impactful. We blend cutting-edge engineering with timeless design principles to create assets that resonate deeply with users.</p>
-
-            <div class="philosophy-points">
-                <div class="philosophy-point" data-point-id="elegance">
-                    <h3>Elegance in Simplicity</h3>
-                    <p>Drawing inspiration from Jony Ive and Dieter Rams, we strip away the superfluous to reveal the essential. Our designs are clean, intuitive, and beautiful in their clarity.</p>
-                </div>
-                <div class="philosophy-point" data-point-id="efficiency">
-                    <h3>Engineered for Efficiency</h3>
-                    <p>Every line of code, every interaction, is optimized for performance and seamless user experience. We build for speed, reliability, and scalability.</p>
-                </div>
-                <div class="philosophy-point" data-point-id="emotion">
-                    <h3>Emotionally Compelling</h3>
-                    <p>Guided by the insights of Aarron Walter and Julie Zhuo, we craft experiences that delight, inspire, and forge genuine connections.</p>
-                </div>
-                <div class="philosophy-point" data-point-id="usability">
-                    <h3>Uncompromising Usability</h3>
-                    <p>Guided by Don Norman and Jakob Nielsen, we prioritize the user. Our interfaces are intuitive, accessible, and rigorously tested for effortless interaction.</p>
-                </div>
-                <div class="philosophy-point" data-point-id="storytelling">
-                    <h3>Visual Storytelling</h3>
-                    <p>Influenced by Chris Do, we ensure every project tells a compelling visual narrative, transforming complex ideas into engaging experiences.</p>
-                </div>
-                <div class="philosophy-point" data-point-id="adaptability">
-                    <h3>Adaptive & Future-Proof</h3>
-                    <p>Leveraging insights from Luke Wroblewski and Farai Madzima, we ensure our designs are responsive, mobile-first, and built to evolve with technology.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="achievements">
-        <div class="container">
-            <h2>Building Trust Through Expertise</h2>
-            <p>Our commitment to excellence is backed by recognized digital achievements. These badges represent our dedication to continuous learning and mastery in various Google technologies and platforms, ensuring you receive the highest quality of service.</p>
-
-            <div class="badges-grid">
-                <div class="badge-item" data-badge-id="firebase-gemini">
-                    <img src="https://placehold.co/100x100/6A0DAD/FFFFFF?text=Firebase+Gemini" alt="Firebase Extensions with Gemini Badge">
-                    <h4>Firebase Extensions with Gemini</h4>
-                    <p>Certified in integrating AI capabilities with Firebase for advanced applications.</p>
-                </div>
-                <div class="badge-item" data-badge-id="gpay-for-web">
-                    <img src="https://placehold.co/100x100/FFD700/1a1a1a?text=Google+Pay" alt="Google Pay for Web Badge">
-                    <h4>Google Pay for Web</h4>
-                    <p>Proficient in implementing secure and seamless payment experiences on the web.</p>
-                </div>
-                <div class="badge-item" data-badge-id="skillsboost">
-                    <img src="https://placehold.co/100x100/00FFFF/1a1a1a?text=Skills+Boost" alt="Google Cloud Skills Boost Badge">
-                    <h4>Google Cloud Skills Boost</h4>
-                    <p>Demonstrated expertise through hands-on labs and skill assessments on Google Cloud.</p>
-                </div>
-                <div class="badge-item" data-badge-id="ai-gemini-101">
-                    <img src="https://placehold.co/100x100/4B0082/FFFFFF?text=AI+Gemini" alt="AI Gemini 101 Badge">
-                    <h4>AI Gemini 101</h4>
-                    <p>Foundational understanding and application of Google's Gemini AI models.</p>
-                </div>
-                <div class="badge-item" data-badge-id="crossword-solutions">
-                    <img src="https://placehold.co/100x100/A020F0/FFFFFF?text=Crossword+Solutions" alt="Google Crossword Solutions Badge">
-                    <h4>Google Crossword Solutions</h4>
-                    <p>Certified in developing interactive problem-solving and puzzle applications.</p>
-                </div>
-                <div class="badge-item" data-badge-id="skillshop-certified">
-                    <img src="https://placehold.co/100x100/FF8C00/FFFFFF?text=Skillshop+Certified" alt="Google Skillshop Certificate">
-                    <h4>Google Skillshop Certified</h4>
-                    <p>Validated proficiency across various Google marketing and advertising platforms.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="growth-charts">
-        <div class="container">
-            <h2>Visualize Your Growth Potential</h2>
-            <p>
-                Witness the transformative power of strategic digital assets. We don't just build; we empower your brand to achieve unparalleled success, turning every challenge into a stepping stone for remarkable growth.
+        <div id="dpa-section" class="opacity-100 scale-100">
+            <h2 class="text-2xl md:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-500 mb-6 text-center">Data Privacy Agreement</h2>
+            <p class="text-gray-300 mb-4 leading-relaxed text-sm md:text-base">
+                In compliance with the Republic Act No. 10173, also known as the Data Privacy Act of 2012 of the Philippines, we are committed to protecting your personal information.
             </p>
+            <p class="text-gray-300 mb-4 leading-relaxed text-sm md:text-base">
+                By proceeding with this form, you agree that Store of Zu may collect, use, process, and store the personal data you provide for the purpose of processing your order, communicating updates, and maintaining a record of our transactions. This includes your name, contact details, and social media handles.
+            </p>
+            <p class="text-gray-300 mb-6 leading-relaxed text-sm md:text-base">
+                Your data will be kept confidential and will not be shared with third parties without your explicit consent, except as required by law. You have the right to access, correct, or delete your personal information held by us. For more details, please refer to our full Privacy Policy.
+            </p>
+            <div class="flex items-center mb-6">
+                <input type="checkbox" id="agree-dpa" class="form-checkbox">
+                <label for="agree-dpa" class="agree-label">
+                    I have read and agree to the <span class="text-blue-400 hover:text-blue-300 font-medium">Data Privacy Agreement</span> and <span class="text-blue-400 hover:text-blue-300 font-medium">Terms & Conditions</span>.
+                </label>
+            </div>
+            <button id="proceed-button" class="button" disabled>
+                Proceed to Form
+            </button>
+        </div>
 
-            <div class="chart-container">
-                <p style="font-size: 1.5em; color: var(--text-light); max-width: 600px; margin: 0 auto;">
-                    Unlock unparalleled growth. Our meticulously crafted digital solutions are designed to propel your vision forward, transforming challenges into triumphs and aspirations into achievements.
-                </p>
+        <form id="order-form" class="hidden opacity-0 translate-y-4" action="https://formspree.io/f/mqabzjvl" method="POST">
+            <h1 class="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-500 mb-6 text-center drop-shadow-lg">
+                Store of Zu Order Request
+            </h1>
+
+            <div class="mb-6 p-4 bg-gray-800/50 rounded-md border border-gray-700 shadow-inner">
+                <h2 class="section-title">Order Details</h2>
+                <div class="form-group">
+                    <label for="order-type" class="form-label">Type of Order <span class="text-red-400">*</span></label>
+                    <input type="text" id="order-type" name="Order Type" required class="form-input" placeholder="e.g., Custom Illustration, Website Design, Video Editing">
+                </div>
+                <div class="form-group">
+                    <label for="order-description" class="form-label">Detailed Description <span class="text-red-400">*</span></label>
+                    <textarea id="order-description" name="Description" rows="4" required class="form-textarea" placeholder="Please provide as much detail as possible about your project, including specific requirements, desired outcomes, and any reference materials."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="deadline" class="form-label">Preferred Deadline</label>
+                    <input type="date" id="deadline" name="Deadline" class="form-input">
+                </div>
+            </div>
+
+            <div class="mb-6 p-4 bg-gray-800/50 rounded-md border border-gray-700 shadow-inner">
+                <h2 class="section-title">Client Information</h2>
+                <div class="form-group">
+                    <label for="full-name" class="form-label">Full Name <span class="text-red-400">*</span></label>
+                    <input type="text" id="full-name" name="Full Name" required class="form-input" placeholder="John Doe">
+                </div>
+                <div class="form-group">
+                    <label for="email" class="form-label">Email Address <span class="text-red-400">*</span></label>
+                    <input type="email" id="email" name="Email" required class="form-input" placeholder="your.email@example.com">
+                </div>
+                <div class="form-group">
+                    <label for="phone" class="form-label">Phone Number <span class="text-red-400">*</span></label>
+                    <input type="tel" id="phone" name="Phone Number" required class="form-input" placeholder="+63 9XX XXX XXXX">
+                </div>
+            </div>
+
+            <div class="mb-6 p-4 bg-gray-800/50 rounded-md border border-gray-700 shadow-inner">
+                <h2 class="section-title">Social Media & Links <span class="text-gray-400 text-sm">(Optional)</span></h2>
+                <p class="text-gray-400 text-sm mb-2">Provide links or usernames to help us understand your brand or connect with you.</p>
+                <div class="form-group">
+                    <label for="facebook" class="form-label">Facebook Profile/Page</label>
+                    <input type="text" id="facebook" name="Facebook Profile" class="form-input" placeholder="https://facebook.com/yourpage or @yourusername">
+                </div>
+                <div class="form-group">
+                    <label for="instagram" class="form-label">Instagram Handle</label>
+                    <input type="text" id="instagram" name="Instagram Handle" class="form-input" placeholder="@yourinstagram">
+                </div>
+                <div class="form-group">
+                    <label for="twitter" class="form-label">Twitter/X Handle</label>
+                    <input type="text" id="twitter" name="Twitter Handle" class="form-input" placeholder="@yourtwitter">
+                </div>
+            </div>
+
+            <button type="submit" class="button">
+                Submit Order Request
+            </button>
+        </form>
+
+        <div id="message-box" class="hidden">
+            <div class="message-box-content">
+                <h3 id="message-box-title" class="message-box-title"></h3>
+                <p id="message-box-content" class="message-box-text"></p>
+                <button id="message-box-close" class="message-box-close-button">
+                    Close
+                </button>
             </div>
         </div>
-    </section>
 
-    <section id="cta">
-        <div class="container">
-            <h2>Ready to Connect?</h2>
-            <p>Let's craft your next digital masterpiece. Whether it's a new website, a captivating logo, or an AI-powered solution, SYNAPSE is here to bring your vision to life.</p>
+    </div>
 
-            <div class="cta-button-wrapper">
-                <a href="YOUR_EXTERNAL_LINK_HERE" class="btn contact-btn" target="_blank" rel="noopener noreferrer">Get in Touch Now!</a>
-            </div>
-        </div>
-    </section>
-
-    <footer>
-        <div class="container">
-            <p>&copy; 2025 SYNAPSE by Store of Zu. All rights reserved.</p>
-            <div class="social-links">
-                <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
-                <a href="#" aria-label="TikTok"><i class="fab fa-tiktok"></i></a>
-                <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-            </div>
-            <p>Crafted with precision and passion.</p>
-        </div>
-    </footer>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
-    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
     <script>
-        /*
-         * Don Norman: "The user flow should be effortless. The animations should provide clear feedback and enhance comprehension."
-         * Aarron Walter: "The microinteractions should delight. The overall experience should build trust and excitement."
-         * Irene Au: "The interaction design needs to be seamless. Hover states and transitions should feel natural and responsive."
-         */
+        const agreeDpaCheckbox = document.getElementById('agree-dpa');
+        const proceedButton = document.getElementById('proceed-button');
+        const dpaSection = document.getElementById('dpa-section');
+        const orderForm = document.getElementById('order-form');
+        const messageBox = document.getElementById('message-box'); // Kept for DPA message
+        const messageBoxTitle = document.getElementById('message-box-title');
+        const messageBoxContent = document.getElementById('message-box-content');
+        const messageBoxClose = document.getElementById('message-box-close');
 
-        document.addEventListener('DOMContentLoaded', () => {
-            // --- Hero Section Animations ---
-            // Chris Do: "The gradient on the hero needs to set the mood – sophisticated, forward-thinking."
-            // Jony Ive: "The animations should feel fluid and intentional."
-            anime({
-                targets: '.brand-name',
-                opacity: [0, 1],
-                translateY: [20, 0],
-                duration: 1500,
-                easing: 'easeOutExpo',
-                delay: 500,
-                begin: function(anim) {
-                    // Ensure elements are visible before animation starts
-                    document.querySelector('.brand-name').style.opacity = '1';
-                }
-            });
+        function showMessageBox(title, content) {
+            messageBoxTitle.textContent = title;
+            messageBoxContent.textContent = content;
+            messageBox.classList.remove('hidden');
+        }
 
-            anime({
-                targets: '.tagline',
-                opacity: [0, 1],
-                translateY: [20, 0],
-                duration: 1500,
-                easing: 'easeOutExpo',
-                delay: 1000,
-                begin: function(anim) {
-                    document.querySelector('.tagline').style.opacity = '1';
-                }
-            });
+        function hideMessageBox() {
+            messageBox.classList.add('hidden');
+        }
 
-            anime({
-                targets: '.explore-btn',
-                opacity: [0, 1],
-                translateY: [20, 0],
-                duration: 1500,
-                easing: 'easeOutExpo',
-                delay: 1500,
-                begin: function(anim) {
-                    document.querySelector('.explore-btn').style.opacity = '1';
-                }
-            });
+        messageBoxClose.addEventListener('click', hideMessageBox);
 
-            // --- Scroll Animations (Intersection Observer) ---
-            // All council members agree on smooth, engaging scroll experiences.
-            const sections = document.querySelectorAll('section');
-
-            const observerOptions = {
-                root: null,
-                rootMargin: '0px',
-                threshold: 0.2 // Trigger when 20% of the section is visible
-            };
-
-            const sectionObserver = new IntersectionObserver((entries, observer) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        const sectionId = entry.target.id;
-                        if (sectionId === 'services') {
-                            // Animate service cards
-                            anime({
-                                targets: '.service-card',
-                                opacity: [0, 1],
-                                translateY: [50, 0],
-                                duration: 1000,
-                                easing: 'easeOutExpo',
-                                delay: anime.stagger(100, {start: 300}), // Stagger animation
-                                complete: function(anim) {
-                                    // Ensure elements remain visible after animation
-                                    document.querySelectorAll('.service-card').forEach(el => el.style.opacity = '1');
-                                }
-                            });
-                        } else if (sectionId === 'about') {
-                            // Animate philosophy points
-                            anime({
-                                targets: '.philosophy-point',
-                                opacity: [0, 1],
-                                translateY: [50, 0],
-                                duration: 1000,
-                                easing: 'easeOutExpo',
-                                delay: anime.stagger(100, {start: 300}),
-                                complete: function(anim) {
-                                    document.querySelectorAll('.philosophy-point').forEach(el => el.style.opacity = '1');
-                                }
-                            });
-                        } else if (sectionId === 'achievements') {
-                            // Animate badge items
-                            anime({
-                                targets: '.badge-item',
-                                opacity: [0, 1],
-                                translateY: [50, 0],
-                                duration: 1000,
-                                easing: 'easeOutExpo',
-                                delay: anime.stagger(100, {start: 300}),
-                                complete: function(anim) {
-                                    document.querySelectorAll('.badge-item').forEach(el => el.style.opacity = '1');
-                                }
-                            });
-                        } else if (sectionId === 'growth-charts') {
-                            // Animate chart container
-                            anime({
-                                targets: '.chart-container',
-                                opacity: [0, 1],
-                                translateY: [50, 0],
-                                duration: 1000,
-                                easing: 'easeOutExpo',
-                                delay: 300,
-                                complete: function(anim) {
-                                    document.querySelector('.chart-container').style.opacity = '1';
-                                    // No animation to initialize here, as it's replaced with text
-                                }
-                            });
-                        } else if (sectionId === 'cta') {
-                            // Animate CTA button wrapper
-                            anime({
-                                targets: '.cta-button-wrapper',
-                                opacity: [0, 1],
-                                translateY: [50, 0],
-                                duration: 1000,
-                                easing: 'easeOutExpo',
-                                delay: 300,
-                                complete: function(anim) {
-                                    document.querySelector('.cta-button-wrapper').style.opacity = '1';
-                                }
-                            });
-                        }
-                        observer.unobserve(entry.target); // Only animate once
-                    }
-                });
-            }, observerOptions);
-
-            sections.forEach(section => {
-                // Skip hero as it has its own initial animation
-                if (section.id !== 'hero') {
-                    sectionObserver.observe(section);
-                }
-            });
-
-            // --- Smooth Scroll for Navigation ---
-            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-                anchor.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    document.querySelector(this.getAttribute('href')).scrollIntoView({
-                        behavior: 'smooth'
-                    });
-                });
-            });
-
-            // --- Popping Bars Animation (Removed) ---
-            // The initBarAnimation function and related logic are no longer needed.
+        agreeDpaCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+                proceedButton.disabled = false;
+                proceedButton.classList.remove('opacity-50', 'cursor-not-allowed');
+                proceedButton.classList.add('hover:scale-105');
+            } else {
+                proceedButton.disabled = true;
+                proceedButton.classList.add('opacity-50', 'cursor-not-allowed');
+                proceedButton.classList.remove('hover:scale-105');
+            }
         });
+
+        proceedButton.addEventListener('click', function() {
+            if (agreeDpaCheckbox.checked) {
+                dpaSection.classList.add('opacity-0', 'scale-95');
+                setTimeout(() => {
+                    dpaSection.classList.add('hidden');
+                    orderForm.classList.remove('hidden');
+                    setTimeout(() => {
+                        orderForm.classList.remove('opacity-0', 'translate-y-4');
+                    }, 50);
+                }, 400);
+            } else {
+                showMessageBox('Agreement Required', 'Please agree to the Data Privacy Agreement and Terms & Conditions to proceed.');
+            }
+        });
+
+        // With Formspree, you don't need a custom JavaScript submission handler.
+        // The form's 'action' and 'method' attributes handle the submission directly.
+        // Formspree redirects to a thank you page by default, or you can configure a custom redirect URL.
+        // The message box for submission success/failure is no longer needed for Formspree.
+        // If you want a custom success message without redirect, you'd use their AJAX feature:
+        // https://formspree.io/forms/f/{your-form-id}/settings/integrations/ajax
+        // For simplicity, we'll let Formspree handle the redirect.
     </script>
 </body>
 </html>
