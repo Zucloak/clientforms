@@ -34,7 +34,7 @@
             align-items: flex-start; /* Align to top for longer forms */
             min-height: 100vh;
             /* === MODIFIED FOR MOBILE OPTIMIZATION === */
-            padding: 1.5rem 0.75rem; /* Reduced padding for very small screens (24px top/bottom, 12px left/right) */
+            padding: 1.5rem 0.5rem; /* Further reduced padding for very small screens (24px top/bottom, 8px left/right) */
             /* === END MODIFICATION === */
             box-sizing: border-box;
         }
@@ -57,7 +57,7 @@
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 10px 20px -5px rgba(0, 0, 0, 0.1); /* More prominent shadow */
             overflow: hidden;
             /* === MODIFIED FOR MOBILE OPTIMIZATION === */
-            padding: 1.25rem; /* Reduced base padding for small screens (20px all around) */
+            padding: 1rem; /* Further reduced base padding for small screens (16px all around) */
             /* === END MODIFICATION === */
             border: 1px solid #2d3748; /* Subtle border */
         }
@@ -84,13 +84,23 @@
         #dpa-section {
             position: relative;
             z-index: 10;
-            padding: 2rem; /* Adjusted padding */
+            /* === MODIFIED FOR MOBILE OPTIMIZATION === */
+            padding: 1.5rem; /* Reduced padding for mobile */
+            /* === END MODIFICATION === */
             background-color: #242b38; /* Darker blue-gray for sections */
             border-radius: 0.75rem; /* More rounded */
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* More pronounced inner shadow */
             transition: all 0.4s ease-in-out; /* Smoother transition */
             border: 1px solid #374151; /* Clearer border */
         }
+        /* === NEW MEDIA QUERY FOR DPA SECTION PADDING === */
+        @media (min-width: 640px) { /* sm breakpoint */
+            #dpa-section {
+                padding: 2rem; /* Original padding for small screens and up */
+            }
+        }
+        /* === END NEW MEDIA QUERY === */
+
 
         #order-form {
             position: relative;
@@ -105,7 +115,7 @@
 
         .section-title {
             /* === MODIFIED FOR MOBILE OPTIMIZATION === */
-            font-size: 1.5rem; /* Smaller base font size for mobile (24px) */
+            font-size: 1.375rem; /* Even smaller base font size for mobile (22px) */
             /* === END MODIFICATION === */
             font-weight: 600; /* Semibold */
             color: #e2e8f0; /* Ensure good contrast */
@@ -116,12 +126,12 @@
         /* === NEW MEDIA QUERIES FOR SECTION TITLE FONT SIZE === */
         @media (min-width: 640px) { /* sm breakpoint */
             .section-title {
-                font-size: 2rem; /* Original size for small screens and up */
+                font-size: 1.75rem; /* Slightly larger for small screens (28px) */
             }
         }
         @media (min-width: 768px) { /* md breakpoint */
             .section-title {
-                font-size: 2rem; /* Remains 2rem for md */
+                font-size: 2rem; /* Original size for medium screens and up */
             }
         }
         /* === END NEW MEDIA QUERIES === */
