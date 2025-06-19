@@ -6,6 +6,22 @@
     <title>Client Order Form - SYNAPPSE</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!--
+        Content Security Policy (CSP):
+        This meta tag helps protect against Cross-Site Scripting (XSS) and data injection attacks
+        by restricting the sources from which the browser can load resources.
+
+        Updated for Google Apps Script (FormEasy backend).
+        'script.google.com' is allowed for script execution and form submissions.
+    -->
+    <meta http-equiv="Content-Security-Policy" content="
+        default-src 'self';
+        script-src 'self' https://cdn.tailwindcss.com 'unsafe-inline';
+        style-src 'self' https://fonts.googleapis.com https://cdn.tailwindcss.com 'unsafe-inline';
+        font-src 'self' https://fonts.gstatic.com;
+        connect-src 'self' https://script.google.com; /* Allow connections to Google Apps Script */
+        form-action https://script.google.com; /* Allow form submissions to Google Apps Script */
+    ">
     <style>
         /* Custom scrollbar for a sleeker look */
         ::-webkit-scrollbar {
@@ -54,11 +70,8 @@
             position: relative;
             width: 100%;
             max-width: 48rem; /* Increased max-width for a slightly wider form */
-            /* Removed background-color, border-radius, box-shadow, overflow, padding, and border */
-            /* These styles are now applied to individual sections or are part of the body background */
         }
 
-        /* Adjust form container padding for medium screens and up */
         @media (min-width: 768px) { /* md breakpoint */
             .form-container {
                 /* No padding here as it's now handled by body or individual sections */
@@ -95,10 +108,6 @@
                 padding: 2rem; /* Original padding for small screens and up */
             }
         }
-
-        /* Order form sections will now have no explicit border or distinct background */
-        /* The individual form sections will rely on the body background */
-
 
         .section-title {
             /* Default font size for mobile-first approach */
@@ -224,6 +233,75 @@
         #message-box {
             display: none; /* Hide the message box for Formspree */
         }
+
+        /* Styles for the custom message box */
+        .message-box-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+        }
+
+        .message-box-overlay.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .message-box-content {
+            background-color: #242b38;
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 15px 25px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            transform: translateY(-20px);
+            opacity: 0;
+            transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+        }
+
+        .message-box-overlay.visible .message-box-content {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .message-box-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #e2e8f0;
+            margin-bottom: 1rem;
+        }
+
+        .message-box-text {
+            font-size: 1rem;
+            color: #cbd5e0;
+            margin-bottom: 1.5rem;
+        }
+
+        .message-box-close-button {
+            background: linear-gradient(to right, #3b82f6, #2563eb);
+            color: #f9fafb;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.2s ease;
+        }
+
+        .message-box-close-button:hover {
+            background: linear-gradient(to right, #60a5fa, #3b82f6);
+            transform: translateY(-1px);
+        }
     </style>
 </head>
 <body class="antialiased">
@@ -250,7 +328,7 @@
             </button>
         </div>
 
-        <form id="order-form" class="hidden opacity-0 translate-y-4" action="https://formspree.io/f/xwpbllje" method="POST">
+        <form id="order-form" class="hidden opacity-0 translate-y-4" action="https://script.google.com/macros/s/AKfycbx9hkusEO2X0R7QGlFLQ6mwPuDVXOC-a039eVJE2WIsKVDf95LuUMpdlz9I6O3ZXVFh/exec" method="POST">
             <h1 class="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-500 mb-6 text-center drop-shadow-lg">
                 SYNAPPSE Order Request
             </h1>
@@ -304,15 +382,21 @@
                 </div>
             </div>
 
-            <button type="submit" class="button">
+            <!-- Honeypot field for bot detection -->
+            <div style="position: absolute; left: -9999px;">
+                <input type="text" name="hp_email" tabindex="-1" autocomplete="off">
+            </div>
+
+            <button type="submit" id="submit-button" class="button">
                 Submit Order Request
             </button>
         </form>
 
-        <div id="message-box" class="hidden">
+        <!-- Custom Message Box for DPA and other client-side messages -->
+        <div id="message-box-overlay" class="message-box-overlay">
             <div class="message-box-content">
                 <h3 id="message-box-title" class="message-box-title"></h3>
-                <p id="message-box-content" class="message-box-text"></p>
+                <p id="message-box-text" class="message-box-text"></p>
                 <button id="message-box-close" class="message-box-close-button">
                     Close
                 </button>
@@ -322,27 +406,53 @@
     </div>
 
     <script>
+        // IMPORTANT: Configure your FormEasy backend URL here.
+        // Replace this with your actual Google Apps Script Web App URL.
+        // It will look something like: 'https://script.google.com/macros/s/AKfycb.../exec'
+        const FORMEASY_API_ENDPOINT = 'YOUR_APPS_SCRIPT_WEB_APP_URL';
+
         const agreeDpaCheckbox = document.getElementById('agree-dpa');
         const proceedButton = document.getElementById('proceed-button');
         const dpaSection = document.getElementById('dpa-section');
         const orderForm = document.getElementById('order-form');
-        const messageBox = document.getElementById('message-box'); // Kept for DPA message
+        const submitButton = document.getElementById('submit-button');
+        const messageBoxOverlay = document.getElementById('message-box-overlay');
         const messageBoxTitle = document.getElementById('message-box-title');
-        const messageBoxContent = document.getElementById('message-box-content');
+        const messageBoxText = document.getElementById('message-box-text');
         const messageBoxClose = document.getElementById('message-box-close');
 
+        // Client-side rate limiting variables
+        const SUBMISSION_COOLDOWN_TIME_MS = 5000; // 5 seconds cooldown
+        let lastSubmissionTime = 0;
+
+        /**
+         * Displays a custom message box to the user.
+         * @param {string} title - The title of the message box.
+         * @param {string} content - The content/body of the message.
+         */
         function showMessageBox(title, content) {
             messageBoxTitle.textContent = title;
-            messageBoxContent.textContent = content;
-            messageBox.classList.remove('hidden');
+            messageBoxText.textContent = content;
+            messageBoxOverlay.classList.add('visible');
         }
 
+        /**
+         * Hides the custom message box.
+         */
         function hideMessageBox() {
-            messageBox.classList.add('hidden');
+            messageBoxOverlay.classList.remove('visible');
         }
 
+        // Event listener for closing the message box
         messageBoxClose.addEventListener('click', hideMessageBox);
+        messageBoxOverlay.addEventListener('click', function(event) {
+            // Close if clicked outside the content box
+            if (event.target === messageBoxOverlay) {
+                hideMessageBox();
+            }
+        });
 
+        // Toggle proceed button based on DPA checkbox
         agreeDpaCheckbox.addEventListener('change', function() {
             if (this.checked) {
                 proceedButton.disabled = false;
@@ -355,18 +465,111 @@
             }
         });
 
+        // Handle proceed button click
         proceedButton.addEventListener('click', function() {
             if (agreeDpaCheckbox.checked) {
+                // Animate DPA section out
                 dpaSection.classList.add('opacity-0', 'scale-95');
                 setTimeout(() => {
                     dpaSection.classList.add('hidden');
+                    // Animate order form in
                     orderForm.classList.remove('hidden');
                     setTimeout(() => {
                         orderForm.classList.remove('opacity-0', 'translate-y-4');
-                    }, 50);
-                }, 400);
+                    }, 50); // Small delay to allow 'hidden' class to apply before starting transition
+                }, 400); // Wait for DPA section fade-out transition
             } else {
                 showMessageBox('Agreement Required', 'Please agree to the Data Privacy Agreement and Terms & Conditions to proceed.');
+            }
+        });
+
+        // Add input sanitization for all text and textarea inputs
+        document.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], textarea').forEach(input => {
+            input.addEventListener('paste', function(event) {
+                event.preventDefault(); // Prevent default paste behavior
+                const text = event.clipboardData.getData('text/plain'); // Get plain text from clipboard
+                // Sanitize the pasted text: remove any HTML tags
+                const sanitizedText = text.replace(/<[^>]*>?/gm, '');
+                // Insert sanitized text at the current cursor position
+                const start = this.selectionStart;
+                const end = this.selectionEnd;
+                this.value = this.value.substring(0, start) + sanitizedText + this.value.substring(end);
+                this.setSelectionRange(start + sanitizedText.length, start + sanitizedText.length);
+                this.dispatchEvent(new Event('input', { bubbles: true })); // Trigger input event for validation/other handlers
+            });
+
+            // Basic input validation on input event (can be expanded)
+            input.addEventListener('input', function() {
+                // Example: Prevent leading/trailing whitespace
+                // This is a simple client-side measure; server-side is essential
+                if (this.value.length > 0 && (this.value.startsWith(' ') || this.value.endsWith(' '))) {
+                    this.value = this.value.trim();
+                }
+            });
+        });
+
+
+        // Handle form submission with client-side rate limiting and fetch API
+        orderForm.addEventListener('submit', async function(event) {
+            event.preventDefault(); // Prevent default form submission
+
+            const currentTime = Date.now();
+            if (currentTime - lastSubmissionTime < SUBMISSION_COOLDOWN_TIME_MS) {
+                showMessageBox('Too Many Requests', `Please wait ${((SUBMISSION_COOLDOWN_TIME_MS - (currentTime - lastSubmissionTime)) / 1000).toFixed(1)} seconds before submitting again.`);
+                return;
+            }
+
+            lastSubmissionTime = currentTime; // Update last submission time
+
+            // Disable button immediately after submission to prevent double clicks
+            submitButton.disabled = true;
+            submitButton.textContent = 'Submitting...'; // Provide feedback
+            submitButton.classList.add('opacity-50', 'cursor-not-allowed');
+
+            const formData = new FormData(orderForm);
+            const data = {};
+            // FormEasy expects name, email, message by default, and others via setFields.
+            // Ensure the keys here match your form field 'name' attributes.
+            for (let [key, value] of formData.entries()) {
+                data[key] = value;
+            }
+
+            try {
+                // FormEasy expects 'Content-Type': 'application/x-www-form-urlencoded' or no header for typical form submissions,
+                // but since we are sending JSON, we must stick with 'application/json' for fetch to send stringified JSON.
+                // The doPost function in Apps Script with FormEasy.action(req) handles JSON parsing automatically.
+                const response = await fetch(FORMEASY_API_ENDPOINT, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json' // FormEasy's doPost can parse JSON body
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                // FormEasy.action(req) returns a ContentService.createTextOutput()
+                // which often has a default Content-Type like text/html or text/plain.
+                // It does NOT necessarily return JSON by default for success/failure.
+                // We'll check for response.ok (status 200) for success.
+                if (response.ok) {
+                    // FormEasy usually returns a simple success message or no body on success.
+                    // If you've customized FormEasy to return JSON, uncomment and use response.json().
+                    // const result = await response.json();
+                    console.log('Form submission successful. Response:', await response.text()); // Log raw response text
+                    showMessageBox('Success!', 'Your order request has been submitted successfully. We will get back to you shortly.');
+                    orderForm.reset(); // Clear the form fields
+                } else {
+                    const errorText = await response.text(); // Get raw text for errors
+                    console.error('Form submission failed:', response.status, errorText);
+                    showMessageBox('Submission Failed', `There was an error submitting your form: ${response.status} - ${errorText || 'Unknown Error'}. Please check your Apps Script setup.`);
+                }
+            } catch (error) {
+                console.error('Network error during form submission:', error);
+                showMessageBox('Network Error', 'Could not connect to the Google Apps Script server. Please check your internet connection and verify the API endpoint.');
+            } finally {
+                // Re-enable button after response (or error)
+                submitButton.disabled = false;
+                submitButton.textContent = 'Submit Order Request';
+                submitButton.classList.remove('opacity-50', 'cursor-not-allowed');
             }
         });
 
@@ -376,12 +579,17 @@
         document.addEventListener('keydown', event => {
             // Disable Ctrl+C, Ctrl+X, Ctrl+A, Ctrl+U, F12 (for Windows/Linux)
             // Disable Cmd+C, Cmd+X, Cmd+A, Cmd+U, Option+Cmd+I (for Mac)
+            // Also prevent F10 (menu bar)
             if ((event.ctrlKey || event.metaKey) && ['c', 'x', 'a', 'u'].includes(event.key.toLowerCase())) {
                 event.preventDefault();
             }
             if (event.key === 'F12' || (event.metaKey && event.altKey && event.key === 'i')) { // F12 and Option+Cmd+I for dev tools
                 event.preventDefault();
             }
+            if (event.key === 'F10') { // F10 for menu bar
+                event.preventDefault();
+            }
+            // Note: Alt+F4 is generally handled by the OS and might not be preventable here.
         });
 
         // Disable text selection using CSS (already added to body style)
