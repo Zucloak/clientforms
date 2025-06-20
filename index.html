@@ -328,7 +328,7 @@
             </button>
         </div>
 
-        <form id="order-form" class="hidden opacity-0 translate-y-4" action="https://script.google.com/macros/s/AKfycbx9hkusEO2X0R7QGlFLQ6mwPuDVXOC-a039eVJE2WIsKVDf95LuUMpdlz9I6O3ZXVFh/exec" method="POST">
+        <form id="order-form" class="hidden opacity-0 translate-y-4" action="https://script.google.com/macros/s/AKfycbzafDPxkNJC4FGD10jHtf0YfrXZLqqpT4dQ6ac_U1YWKqrhLCcJmxjxv95tXkQbCFfD/exec" method="POST">
             <h1 class="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-500 mb-6 text-center drop-shadow-lg">
                 SYNAPPSE Order Request
             </h1>
@@ -524,38 +524,27 @@
             submitButton.classList.add('opacity-50', 'cursor-not-allowed');
 
             const formData = new FormData(orderForm);
-            const data = {};
-            // FormEasy expects name, email, message by default, and others via setFields.
-            // Ensure the keys here match your form field 'name' attributes.
-            for (let [key, value] of formData.entries()) {
-                data[key] = value;
-            }
+            // Convert FormData to URL-encoded string
+            const urlEncodedData = new URLSearchParams(formData).toString();
 
             try {
-                // FormEasy expects 'Content-Type': 'application/x-www-form-urlencoded' or no header for typical form submissions,
-                // but since we are sending JSON, we must stick with 'application/json' for fetch to send stringified JSON.
-                // The doPost function in Apps Script with FormEasy.action(req) handles JSON parsing automatically.
+                // Changed Content-Type to 'application/x-www-form-urlencoded'
+                // This matches what typical HTML form submissions send and is often
+                // easier for Apps Script's doPost to process with 'postData.contents'
                 const response = await fetch(FORMEASY_API_ENDPOINT, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json' // FormEasy's doPost can parse JSON body
+                        'Content-Type': 'application/x-www-form-urlencoded'
                     },
-                    body: JSON.stringify(data)
+                    body: urlEncodedData // Send as URL-encoded string
                 });
 
-                // FormEasy.action(req) returns a ContentService.createTextOutput()
-                // which often has a default Content-Type like text/html or text/plain.
-                // It does NOT necessarily return JSON by default for success/failure.
-                // We'll check for response.ok (status 200) for success.
                 if (response.ok) {
-                    // FormEasy usually returns a simple success message or no body on success.
-                    // If you've customized FormEasy to return JSON, uncomment and use response.json().
-                    // const result = await response.json();
-                    console.log('Form submission successful. Response:', await response.text()); // Log raw response text
+                    console.log('Form submission successful. Response:', await response.text());
                     showMessageBox('Success!', 'Your order request has been submitted successfully. We will get back to you shortly.');
                     orderForm.reset(); // Clear the form fields
                 } else {
-                    const errorText = await response.text(); // Get raw text for errors
+                    const errorText = await response.text();
                     console.error('Form submission failed:', response.status, errorText);
                     showMessageBox('Submission Failed', `There was an error submitting your form: ${response.status} - ${errorText || 'Unknown Error'}. Please check your Apps Script setup.`);
                 }
@@ -563,7 +552,6 @@
                 console.error('Network error during form submission:', error);
                 showMessageBox('Network Error', 'Could not connect to the Google Apps Script server. Please check your internet connection and verify the API endpoint.');
             } finally {
-                // Re-enable button after response (or error)
                 submitButton.disabled = false;
                 submitButton.textContent = 'Submit Order Request';
                 submitButton.classList.remove('opacity-50', 'cursor-not-allowed');
@@ -571,26 +559,19 @@
         });
 
         // Code Protection: Disable right-click and common copy shortcuts
-        document.addEventListener('contextmenu', event => event.preventDefault()); // Disable right-click
+        document.addEventListener('contextmenu', event => event.preventDefault());
 
         document.addEventListener('keydown', event => {
-            // Disable Ctrl+C, Ctrl+X, Ctrl+A, Ctrl+U, F12 (for Windows/Linux)
-            // Disable Cmd+C, Cmd+X, Cmd+A, Cmd+U, Option+Cmd+I (for Mac)
-            // Also prevent F10 (menu bar)
             if ((event.ctrlKey || event.metaKey) && ['c', 'x', 'a', 'u'].includes(event.key.toLowerCase())) {
                 event.preventDefault();
             }
-            if (event.key === 'F12' || (event.metaKey && event.altKey && event.key === 'i')) { // F12 and Option+Cmd+I for dev tools
+            if (event.key === 'F12' || (event.metaKey && event.altKey && event.key === 'i')) {
                 event.preventDefault();
             }
-            if (event.key === 'F10') { // F10 for menu bar
+            if (event.key === 'F10') {
                 event.preventDefault();
             }
-            // Note: Alt+F4 is generally handled by the OS and might not be preventable here.
         });
-
-        // Disable text selection using CSS (already added to body style)
-        // body { -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; }
     </script>
 </body>
 </html>
