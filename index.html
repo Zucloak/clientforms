@@ -328,7 +328,7 @@
             </button>
         </div>
 
-        <form id="order-form" class="hidden opacity-0 translate-y-4" action="https://script.google.com/macros/s/AKfycbzafDPxkNJC4FGD10jHtf0YfrXZLqqpT4dQ6ac_U1YWKqrhLCcJmxjxv95tXkQbCFfD/exec" method="POST">
+        <form id="order-form" class="hidden opacity-0 translate-y-4" action="https://script.google.com/macros/s/AKfycby8oSjmUDlyGVxfMh3HeSFKNrmCiLzZ-Egpre59xDfg26lJNutgtIE3MKadpRaI9MQ/exec" method="POST">
             <h1 class="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-500 mb-6 text-center drop-shadow-lg">
                 SYNAPPSE Order Request
             </h1>
@@ -406,7 +406,8 @@
     </div>
 
     <script>
-        const FORMEASY_API_ENDPOINT = 'https://script.google.com/macros/s/AKfycbzafDPxkNJC4FGD10jHtf0YfrXZLqqpT4dQ6ac_U1YWKqrhLCcJmxjxv95tXkQbCFfD/exec';
+        // Make sure this API endpoint EXACTLY matches your deployed Google Apps Script Web App URL.
+        const FORMEASY_API_ENDPOINT = 'https://script.google.com/macros/s/AKfycby8oSjmUDlyGVxfMh3HeSFKNrmCiLzZ-Egpre59xDfg26lJNutgtIE3MKadpRaI9MQ/exec';
 
         const agreeDpaCheckbox = document.getElementById('agree-dpa');
         const proceedButton = document.getElementById('proceed-button');
@@ -527,30 +528,37 @@
             // Convert FormData to URL-encoded string
             const urlEncodedData = new URLSearchParams(formData).toString();
 
+            // Log the endpoint and data just before fetch for debugging
+            console.log('Attempting fetch to:', FORMEASY_API_ENDPOINT);
+            console.log('Sending data:', urlEncodedData);
+
             try {
-                // Changed Content-Type to 'application/x-www-form-urlencoded'
-                // This matches what typical HTML form submissions send and is often
-                // easier for Apps Script's doPost to process with 'postData.contents'
                 const response = await fetch(FORMEASY_API_ENDPOINT, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded'
                     },
-                    body: urlEncodedData // Send as URL-encoded string
+                    body: urlEncodedData, // Send as URL-encoded string
+                    mode: 'cors' // Ensure CORS mode is used
                 });
 
+                // Log response headers for debugging
+                console.log('Response Headers:', Object.fromEntries(response.headers.entries()));
+
                 if (response.ok) {
-                    console.log('Form submission successful. Response:', await response.text());
+                    const responseText = await response.text(); // Get the raw response text
+                    console.log('Form submission successful. Raw Response from Apps Script:', responseText);
                     showMessageBox('Success!', 'Your order request has been submitted successfully. We will get back to you shortly.');
                     orderForm.reset(); // Clear the form fields
                 } else {
                     const errorText = await response.text();
-                    console.error('Form submission failed:', response.status, errorText);
+                    console.error('Form submission failed (HTTP Status ' + response.status + '):', errorText);
                     showMessageBox('Submission Failed', `There was an error submitting your form: ${response.status} - ${errorText || 'Unknown Error'}. Please check your Apps Script setup.`);
                 }
             } catch (error) {
-                console.error('Network error during form submission:', error);
-                showMessageBox('Network Error', 'Could not connect to the Google Apps Script server. Please check your internet connection and verify the API endpoint.');
+                // This catch block means the fetch operation itself failed (e.g., network down, CORS blocked by browser, or very unexpected response type)
+                console.error('Network error during form submission (Failed to fetch):', error);
+                showMessageBox('Network Error', 'Could not connect to the Google Apps Script server. Please check your internet connection and verify the API endpoint. Also, check your browser\'s console and network tab for more details.');
             } finally {
                 submitButton.disabled = false;
                 submitButton.textContent = 'Submit Order Request';
