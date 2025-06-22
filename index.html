@@ -122,13 +122,31 @@
             transform: translateY(-2px); /* Slight lift effect */
         }
 
-        /* Custom CSS to explicitly control date and time input widths on mobile */
+        /* Custom CSS for mobile responsiveness */
+        /* Make the main form container take more width on small screens */
+        .form-container-responsive {
+            padding-left: 1rem; /* px-4 */
+            padding-right: 1rem; /* px-4 */
+            max-width: 100%; /* Default to full width */
+        }
+        @media (min-width: 640px) { /* sm breakpoint and up */
+            .form-container-responsive {
+                padding-left: 2.5rem; /* sm:px-10 */
+                padding-right: 2.5rem; /* sm:px-10 */
+                max-width: 48rem; /* sm:max-w-4xl */
+            }
+        }
+        
+        /* Remove explicit max-width from inputs, let them fill their parent's space */
         @media (max-width: 639px) { /* Targets screens smaller than sm breakpoint */
-            input[type="date"],
-            input[type="time"] {
-                max-width: 180px; /* Force a maximum width for native inputs */
-                width: 100%; /* Ensures it still fills its constrained space */
-                margin: 0 auto; /* Center the input within its parent div */
+            .date-time-input-group {
+                /* Removed specific max-width from input[type="date"], input[type="time"] */
+                /* The w-full on input will now respect the new parent container width */
+                width: 100%; /* Ensure the flex item takes full width */
+            }
+            .date-time-input-group label,
+            .date-time-input-group input {
+                text-align: center; /* Center text and input fields */
             }
         }
     </style>
@@ -141,7 +159,7 @@
     </div>
 
     <!-- Main form container with responsive styling and background -->
-    <div id="formContainer" class="w-full max-w-4xl mx-auto bg-purple-900 bg-opacity-70 rounded-xl shadow-2xl p-6 sm:p-10 space-y-8">
+    <div id="formContainer" class="w-full form-container-responsive mx-auto bg-purple-900 bg-opacity-70 rounded-xl shadow-2xl p-6 sm:p-10 space-y-8">
         <h1 class="text-4xl sm:text-5xl font-extrabold text-white text-center mb-6 drop-shadow-lg">SYNAPPSE Order Request</h1>
         
         <!-- Progress Indicator for multi-step form -->
@@ -185,15 +203,15 @@
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div class="w-full flex justify-center"> <!-- Added flex justify-center for consistent centering -->
+                    <div class="w-full flex flex-col items-center date-time-input-group"> <!-- Flex column to center label/input vertically -->
                         <label for="meetingDate" class="block text-base font-medium text-gray-100 mb-2">Schedule a Meeting - Date</label>
                         <input type="date" id="meetingDate" name="meetingDate" required
-                               class="mt-1 block w-full form-field"> <!-- Removed specific width classes from here -->
+                               class="mt-1 block w-full form-field">
                     </div>
-                    <div class="w-full flex justify-center"> <!-- Added flex justify-center for consistent centering -->
+                    <div class="w-full flex flex-col items-center date-time-input-group"> <!-- Flex column to center label/input vertically -->
                         <label for="meetingTime" class="block text-base font-medium text-gray-100 mb-2">Schedule a Meeting - Time</label>
                         <input type="time" id="meetingTime" name="meetingTime" required
-                               class="mt-1 block w-full form-field"> <!-- Removed specific width classes from here -->
+                               class="mt-1 block w-full form-field">
                     </div>
                 </div>
                 <button type="button" id="checkAvailabilityBtn" class="btn-secondary w-full sm:w-auto mt-4">Check Availability</button>
