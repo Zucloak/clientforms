@@ -4,6 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SYNAPPSE Order Request</title>
+     <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
+    <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
+    <link rel="icon" type="image/png" href="/favicon-48x48.png" sizes="48x48">
+    <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96">
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+
+
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180">
+
+    <link rel="icon" type="image/png" href="/android-chrome-192x192.png" sizes="192x192">
+    <link rel="icon" type="image/png" href="/android-chrome-512x512.png" sizes="512x512">
+
+    <link rel="manifest" href="/site.webmanifest">
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts - Inter -->
@@ -15,10 +28,13 @@
     <script type="module" src="./firebase-init.js"></script>
 
     <style>
-        /* Keyframe animation for new background gradient movement */
+        /* Keyframe animation for new background gradient movement, now rotating through corners */
         @keyframes movingGradient {
-            0% { background-position: 0% 0%; }
-            100% { background-position: 100% 100%; }
+            0% { background-position: 0% 0%; }    /* Top-left */
+            25% { background-position: 100% 0%; }   /* Top-right */
+            50% { background-position: 100% 100%; } /* Bottom-right */
+            75% { background-position: 0% 100%; }   /* Bottom-left */
+            100% { background-position: 0% 0%; }   /* Back to Top-left for seamless loop */
         }
 
         /* Keyframe for success checkmark animation */
@@ -37,8 +53,8 @@
             font-family: 'Inter', sans-serif;
             /* Adjusted radial-gradient for even more subtle lighter movement and balanced darker shade */
             /* The first color stop is now almost fully transparent for minimal light */
-            background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.0001) 0%, #6A0DAD 50%, #4B0082 100%);
-            background-size: 400% 400%; /* Larger background to allow for animation */
+            background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.00001) 0%, #5A0DA0 30%, #3A0070 100%);
+            background-size: 400% 400%; /* Larger background to allow for animation and smaller light appearance */
             animation: movingGradient 16s ease infinite; /* Apply the new moving gradient animation */
             color: #ffffff; /* White text for contrast */
             overflow-x: hidden; /* Prevent horizontal scrollbars due to animations */
@@ -159,12 +175,12 @@
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
+                    <div class="w-full max-w-sm mx-auto sm:max-w-none"> <!-- Added max-w-sm and mx-auto for mobile -->
                         <label for="meetingDate" class="block text-base font-medium text-gray-100 mb-2">Schedule a Meeting - Date</label>
                         <input type="date" id="meetingDate" name="meetingDate" required
                                class="mt-1 block w-full form-field">
                     </div>
-                    <div>
+                    <div class="w-full max-w-sm mx-auto sm:max-w-none"> <!-- Added max-w-sm and mx-auto for mobile -->
                         <label for="meetingTime" class="block text-base font-medium text-gray-100 mb-2">Schedule a Meeting - Time</label>
                         <input type="time" id="meetingTime" name="meetingTime" required
                                class="mt-1 block w-full form-field">
@@ -364,7 +380,7 @@
         const customDropdownButton = document.getElementById('customDropdownButton');
         const selectedOptionText = document.getElementById('selectedOptionText');
         const dropdownOptions = document.getElementById('dropdownOptions');
-        const dropdownArrow = document.getElementById('dropdownArrow');
+        const dropdownArrow = document.getElementById('dropdownArrow'); // Corrected
         const typeOfOrderHiddenInput = document.getElementById('typeOfOrder'); // Hidden input for value
 
 
