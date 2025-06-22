@@ -277,7 +277,7 @@
 
                 <div class="flex justify-between mt-8">
                     <button type="button" id="prev3" class="btn-secondary">Previous</button>
-                    <button type="submit" class="btn-primary">Submit</button>
+                    <button type="submit" class="btn-primary">Submit Order Request</button>
                 </div>
             </div>
 
@@ -398,6 +398,10 @@
         const fullName = document.getElementById('fullName');
         const emailAddress = document.getElementById('emailAddress');
         const phoneNumber = document.getElementById('phoneNumber');
+        const facebookProfile = document.getElementById('facebookProfile');
+        const instagramHandle = document.getElementById('instagramHandle');
+        const twitterHandle = document.getElementById('twitterHandle');
+
 
         // Meeting Availability Elements
         const checkAvailabilityBtn = document.getElementById('checkAvailabilityBtn');
@@ -414,7 +418,26 @@
 
         // IMPORTANT: Replace with your deployed FormEasy Apps Script Web App URL
         // This endpoint is used to submit form data to a Google Sheet via Google Apps Script.
-        const FORM_EASY_ENDPOINT = 'https://script.google.com/macros/s/AKfycbwk493phL80NU5ErryswrRgOmrN6fyzpUsSOGyhdXOhrEzPHtnxWq2feJOYa_a6SJG0/exec'; 
+        const FORM_EASY_ENDPOINT = 'https://script.google.com/macros/s/AKfycbzZM7f-hnDPnMJVPu7FrEsrWTDqHSMIsiOpNguIyqcIYZeKGbl1H0jUWrI_g77YAnTPBg/exec'; 
+
+        /**
+         * Safely sanitizes input by escaping HTML characters and removing null bytes.
+         * This helps prevent XSS attacks.
+         * @param {string} value The string to sanitize.
+         * @returns {string} The sanitized string.
+         */
+        function sanitizeInput(value) {
+            if (typeof value !== 'string') {
+                return value; // Return non-string values as is (e.g., numbers, dates which are often handled by input types)
+            }
+            // Remove null bytes
+            let sanitized = value.replace(/\0/g, '');
+
+            // Escape HTML entities to prevent script injection
+            const div = document.createElement('div');
+            div.appendChild(document.createTextNode(sanitized));
+            return div.innerHTML;
+        }
 
         /**
          * Updates the visual appearance of the step indicators based on the current step.
@@ -652,23 +675,22 @@
             formMessage.textContent = ''; // Clear previous messages
             formMessage.className = 'mt-4 text-center text-sm font-medium text-white'; // Reset classes
 
-            const formData = new FormData(form);
             const data = {};
-            // Convert FormData to a plain object for JSON submission
-            formData.forEach((value, key) => {
-                data[key] = value;
-            });
-
+            // Sanitize and collect data from form fields
+            data.typeOfOrder = sanitizeInput(typeOfOrderHiddenInput.value);
+            data.detailedDescription = sanitizeInput(detailedDescription.value);
+            data.meetingDate = sanitizeInput(meetingDate.value); // Dates are generally safer, but sanitizing doesn't hurt.
+            
             // Store original 24-hour time for Firestore Timestamp, but send formatted for FormEasy
-            const originalMeetingTime24h = meetingTime.value; // Use the direct input value here
-
-            // Format meetingTime for both display and Google Sheet
-            if (originalMeetingTime24h) {
-                data.meetingTime = formatTimeForDisplay(originalMeetingTime24h);
-            }
-
-            // The value of typeOfOrder is now taken from the hidden input
-            data.typeOfOrder = typeOfOrderHiddenInput.value;
+            const originalMeetingTime24h = meetingTime.value; 
+            data.meetingTime = sanitizeInput(formatTimeForDisplay(originalMeetingTime24h)); // Sanitize formatted time
+            
+            data.fullName = sanitizeInput(fullName.value);
+            data.emailAddress = sanitizeInput(emailAddress.value); // Emails should be validated with regex, but sanitizing still applies
+            data.phoneNumber = sanitizeInput(phoneNumber.value); // Phone numbers should be validated for format, sanitizing applied
+            data.facebookProfile = sanitizeInput(facebookProfile.value); // URLs should also be validated later
+            data.instagramHandle = sanitizeInput(instagramHandle.value);
+            data.twitterHandle = sanitizeInput(twitterHandle.value);
 
             // Show a loading message during submission
             formMessage.textContent = 'Submitting order request...';
@@ -789,6 +811,50 @@
                 // updateFirebaseStatusUI is already called inside checkFirebaseReady for rejection.
             }
         };
+
+        // --- Copy Protection Code ---
+        // Disable right-click (context menu)
+        document.addEventListener('contextmenu', e => e.preventDefault());
+        
+        // Disable specific keyboard shortcuts for saving, inspecting, copying, printing, etc.
+        document.addEventListener('keydown', e => {
+            const isCtrlOrCmd = e.ctrlKey || e.metaKey; // Checks for Ctrl on Windows/Linux, Cmd on Mac
+            const isShift = e.shiftKey;
+
+            if (
+                // Developer Tools / Inspect Element
+                e.key === 'F12' ||
+                (isCtrlOrCmd && isShift && (e.key === 'I' || e.key === 'i')) || // Ctrl/Cmd + Shift + I
+                (isCtrlOrCmd && isShift && (e.key === 'J' || e.key === 'j')) || // Ctrl/Cmd + Shift + J (Chrome/Edge Dev Tools)
+                (isCtrlOrCmd && isShift && (e.key === 'C' || e.key === 'c')) || // Ctrl/Cmd + Shift + C (Inspect Element)
+
+                // View Page Source
+                (isCtrlOrCmd && (e.key === 'U' || e.key === 'u')) ||
+
+                // Save Page As
+                (isCtrlOrCmd && (e.key === 'S' || e.key === 's')) ||
+
+                // Print
+                (isCtrlOrCmd && (e.key === 'P' || e.key === 'p')) ||
+
+                // Open file
+                (isCtrlOrCmd && (e.key === 'O' || e.key === 'o')) ||
+
+                // New window
+                (isCtrlOrCmd && (e.key === 'N' || e.key === 'n')) ||
+
+                // Copy (redundant but harmless layer)
+                (isCtrlOrCmd && (e.key === 'C' || e.key === 'c')) ||
+
+                // Select All
+                (isCtrlOrCmd && (e.key === 'A' || e.key === 'a'))
+            ) {
+                e.preventDefault();
+                // Optionally, for extremely stubborn cases, stop propagation immediately:
+                // e.stopImmediatePropagation();
+            }
+        });
+        // --- End Copy Protection Code ---
 
     </script>
 </body>
