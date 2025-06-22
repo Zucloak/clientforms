@@ -17,7 +17,6 @@
     <link rel="icon" type="image/png" href="/android-chrome-512x512.png" sizes="512x512">
 
     <link rel="manifest" href="/site.webmanifest"> 
-
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts - Inter -->
@@ -53,8 +52,8 @@
         body {
             font-family: 'Inter', sans-serif;
             /* Adjusted radial-gradient for even more subtle lighter movement and balanced darker shade */
-            /* The first color stop is now almost fully transparent for minimal light */
-            background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.000001) 0%, #5A0DA0 30%, #3A0070 100%);
+            /* Removed 'circle at 50% 50%' to make the 'light' appear only with background-position animation */
+            background: radial-gradient(rgba(255, 255, 255, 0.000001), #5A0DA0, #3A0070);
             background-size: 400% 400%; /* Larger background to allow for animation and smaller light appearance */
             animation: movingGradient 16s ease infinite; /* Apply the new moving gradient animation */
             color: #ffffff; /* White text for contrast */
@@ -176,15 +175,15 @@
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div class="w-full sm:max-w-none"> <!-- Parent div for responsive centering -->
+                    <div class="w-full"> <!-- Removed sm:max-w-none here -->
                         <label for="meetingDate" class="block text-base font-medium text-gray-100 mb-2">Schedule a Meeting - Date</label>
                         <input type="date" id="meetingDate" name="meetingDate" required
-                               class="mt-1 block w-full max-w-xs mx-auto form-field"> <!-- Applied max-w-xs and mx-auto directly -->
+                               class="mt-1 block w-full max-w-xs mx-auto sm:max-w-none form-field"> <!-- Added sm:max-w-none here -->
                     </div>
-                    <div class="w-full sm:max-w-none"> <!-- Parent div for responsive centering -->
+                    <div class="w-full"> <!-- Removed sm:max-w-none here -->
                         <label for="meetingTime" class="block text-base font-medium text-gray-100 mb-2">Schedule a Meeting - Time</label>
                         <input type="time" id="meetingTime" name="meetingTime" required
-                               class="mt-1 block w-full max-w-xs mx-auto form-field"> <!-- Applied max-w-xs and mx-auto directly -->
+                               class="mt-1 block w-full max-w-xs mx-auto sm:max-w-none form-field"> <!-- Added sm:max-w-none here -->
                     </div>
                 </div>
                 <button type="button" id="checkAvailabilityBtn" class="btn-secondary w-full sm:w-auto mt-4">Check Availability</button>
