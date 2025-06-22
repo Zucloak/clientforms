@@ -121,6 +121,16 @@
             background-color: rgba(255, 255, 255, 0.3); /* Slightly less transparent on hover */
             transform: translateY(-2px); /* Slight lift effect */
         }
+
+        /* Custom CSS to explicitly control date and time input widths on mobile */
+        @media (max-width: 639px) { /* Targets screens smaller than sm breakpoint */
+            input[type="date"],
+            input[type="time"] {
+                max-width: 180px; /* Force a maximum width for native inputs */
+                width: 100%; /* Ensures it still fills its constrained space */
+                margin: 0 auto; /* Center the input within its parent div */
+            }
+        }
     </style>
 </head>
 <body class="flex flex-col items-center justify-center min-h-screen p-4 sm:p-6 md:p-8">
@@ -175,15 +185,15 @@
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div class="w-full"> <!-- Removed sm:max-w-none here -->
+                    <div class="w-full flex justify-center"> <!-- Added flex justify-center for consistent centering -->
                         <label for="meetingDate" class="block text-base font-medium text-gray-100 mb-2">Schedule a Meeting - Date</label>
                         <input type="date" id="meetingDate" name="meetingDate" required
-                               class="mt-1 block w-full max-w-xs mx-auto sm:max-w-none form-field"> <!-- Added sm:max-w-none here -->
+                               class="mt-1 block w-full form-field"> <!-- Removed specific width classes from here -->
                     </div>
-                    <div class="w-full"> <!-- Removed sm:max-w-none here -->
+                    <div class="w-full flex justify-center"> <!-- Added flex justify-center for consistent centering -->
                         <label for="meetingTime" class="block text-base font-medium text-gray-100 mb-2">Schedule a Meeting - Time</label>
                         <input type="time" id="meetingTime" name="meetingTime" required
-                               class="mt-1 block w-full max-w-xs mx-auto sm:max-w-none form-field"> <!-- Added sm:max-w-none here -->
+                               class="mt-1 block w-full form-field"> <!-- Removed specific width classes from here -->
                     </div>
                 </div>
                 <button type="button" id="checkAvailabilityBtn" class="btn-secondary w-full sm:w-auto mt-4">Check Availability</button>
