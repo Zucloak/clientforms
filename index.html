@@ -35,8 +35,9 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            /* Adjusted radial-gradient for more subtle lighter movement and balanced darker shade */
-            background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.01), #6A0DAD, #4B0082); /* Very subtle light, main purple, and darker indigo */
+            /* Adjusted radial-gradient for even more subtle lighter movement and balanced darker shade */
+            /* The first color stop is now almost fully transparent for minimal light */
+            background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.0001) 0%, #6A0DAD 50%, #4B0082 100%);
             background-size: 400% 400%; /* Larger background to allow for animation */
             animation: movingGradient 16s ease infinite; /* Apply the new moving gradient animation */
             color: #ffffff; /* White text for contrast */
@@ -108,7 +109,8 @@
 </head>
 <body class="flex flex-col items-center justify-center min-h-screen p-4 sm:p-6 md:p-8">
     <!-- Firebase Status Indicator -->
-    <div id="firebaseStatus" class="mb-4 text-center text-sm font-medium text-red-500">
+    <!-- Hidden by default, shown only when status changes -->
+    <div id="firebaseStatus" class="mb-4 text-center text-sm font-medium hidden">
         Connecting to Forms...
     </div>
 
@@ -264,6 +266,33 @@
         // Timestamp is already imported above, so no need to redeclare here.
 
         /**
+         * Updates the Firebase status message on the UI.
+         * @param {string} message - The message to display.
+         * @param {string} type - 'success', 'error', or 'connecting'.
+         */
+        const updateFirebaseStatusUI = (message, type) => {
+            const statusElement = document.getElementById('firebaseStatus');
+            if (statusElement) {
+                statusElement.textContent = message;
+                statusElement.classList.remove('text-green-500', 'text-red-500', 'text-yellow-500'); // Reset colors
+
+                if (type === 'success') {
+                    statusElement.classList.add('text-green-500');
+                    statusElement.classList.remove('hidden'); // Show on success
+                } else if (type === 'error') {
+                    statusElement.classList.add('text-red-500');
+                    statusElement.classList.remove('hidden'); // Show on error
+                } else if (type === 'connecting') {
+                    statusElement.classList.add('text-yellow-500');
+                    statusElement.classList.remove('hidden'); // Show on connecting
+                } else {
+                    statusElement.classList.add('hidden'); // Hide for other or unknown states
+                }
+            }
+        };
+
+
+        /**
          * Checks if Firebase is initialized and its global variables are available.
          * Resolves when ready, or rejects if it times out.
          * @returns {Promise<void>}
@@ -280,11 +309,13 @@
                         appId = window.appId;
                         clearInterval(interval);
                         console.log("main.js: Firebase globals are ready in main script.");
+                        updateFirebaseStatusUI("Forms are updated in real time.", "success");
                         resolve();
                     } else if (checkCount >= maxChecks) {
                         clearInterval(interval);
                         const errorMessage = `Firebase initialization timed out. Globals status: db=${!!window.db}, userId=${!!window.userId}, appId=${!!window.appId}`;
                         console.error("main.js:", errorMessage);
+                        updateFirebaseStatusUI("Forms are offline: Initialization error.", "error"); // Specific error
                         reject(new Error(errorMessage)); // Reject the promise on timeout
                     }
                     checkCount++;
@@ -292,6 +323,10 @@
             });
         };
         
+        // Initial status update when the main script loads
+        updateFirebaseStatusUI("Connecting to Forms...", "connecting");
+
+
         // Get form and message elements
         const formContainer = document.getElementById('formContainer'); // Main container for the form
         const successMessageContainer = document.getElementById('successMessageContainer'); // New success message container
@@ -700,8 +735,15 @@
         // Ensure Firebase is ready before allowing any interactions that depend on it.
         // This is crucial because the Firebase SDK script loads asynchronously.
         window.onload = async () => {
-            await checkFirebaseReady(); // Wait for Firebase to be fully initialized and globals available
-            console.log("All scripts loaded and Firebase ready for interactions.");
+            // Update initial status when HTML loads, but before Firebase is fully ready
+            updateFirebaseStatusUI("Connecting to Forms...", "connecting");
+            try {
+                await checkFirebaseReady(); // Wait for Firebase to be fully initialized and globals available
+                console.log("All scripts loaded and Firebase ready for interactions.");
+            } catch (error) {
+                console.error("Firebase readiness check failed on onload:", error);
+                // updateFirebaseStatusUI is already called inside checkFirebaseReady for rejection.
+            }
         };
 
     </script>
