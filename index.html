@@ -15,17 +15,12 @@
     <script type="module" src="./firebase-init.js"></script>
 
     <style>
-        /* Keyframe animation for background gradient */
-        @keyframes gradientAnimation {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+        /* Keyframe animation for new background gradient movement */
+        @keyframes movingGradient {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 100% 100%; }
         }
-        /* Keyframe animation for subtle radial shine */
-        @keyframes radialShine {
-            0% { background-position: 50% 50%; background-size: 150% 150%; }
-            100% { background-position: 55% 45%; background-size: 160% 160%; } /* Slight movement and size change */
-        }
+
         /* Keyframe for success checkmark animation */
         @keyframes drawCheck {
             0% {
@@ -40,13 +35,13 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            /* Radial gradient for subtle shine + existing linear gradient */
-            background: radial-gradient(circle at center, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 40%),
-                        linear-gradient(-45deg, #6a0dad, #8a2be2, #9932cc, #da70d6);
-            background-size: 150% 150%, 400% 400%; /* Size for radial, then for linear gradient */
-            animation: radialShine 8s ease-in-out infinite alternate, gradientAnimation 15s ease infinite; /* Apply both animations */
+            /* Adjusted radial-gradient for more subtle lighter movement and balanced darker shade */
+            background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.01), #6A0DAD, #4B0082); /* Very subtle light, main purple, and darker indigo */
+            background-size: 400% 400%; /* Larger background to allow for animation */
+            animation: movingGradient 16s ease infinite; /* Apply the new moving gradient animation */
             color: #ffffff; /* White text for contrast */
             overflow-x: hidden; /* Prevent horizontal scrollbars due to animations */
+            min-height: 100vh; /* Ensure body takes full viewport height */
         }
         /* Custom styles for input, textarea, and select focus states */
         input:focus, textarea:focus, select:focus {
@@ -114,7 +109,7 @@
 <body class="flex flex-col items-center justify-center min-h-screen p-4 sm:p-6 md:p-8">
     <!-- Firebase Status Indicator -->
     <div id="firebaseStatus" class="mb-4 text-center text-sm font-medium text-red-500">
-        Connecting to Firebase...
+        Connecting to Forms...
     </div>
 
     <!-- Main form container with responsive styling and background -->
@@ -284,12 +279,12 @@
                         userId = window.userId;
                         appId = window.appId;
                         clearInterval(interval);
-                        console.log("Firebase globals are ready in main script.");
+                        console.log("main.js: Firebase globals are ready in main script.");
                         resolve();
                     } else if (checkCount >= maxChecks) {
                         clearInterval(interval);
                         const errorMessage = `Firebase initialization timed out. Globals status: db=${!!window.db}, userId=${!!window.userId}, appId=${!!window.appId}`;
-                        console.error(errorMessage);
+                        console.error("main.js:", errorMessage);
                         reject(new Error(errorMessage)); // Reject the promise on timeout
                     }
                     checkCount++;
@@ -460,6 +455,7 @@
             if (validateStep2()) {
                 showStep(3); // Move to Step 3 if Step 2 is valid
             }
+            // No error handling needed here directly, validation handles it.
         });
 
         document.getElementById('prev3').addEventListener('click', () => {
@@ -470,14 +466,9 @@
         checkAvailabilityBtn.addEventListener('click', async () => {
             try {
                 // Ensure Firebase is ready before attempting database operations
-                if (!db || !userId || !appId) {
-                    availabilityMessage.textContent = 'Firebase connecting...'; // More specific message
-                    availabilityMessage.classList.remove('text-green-500', 'text-red-500');
-                    availabilityMessage.classList.add('text-yellow-500');
-                    await checkFirebaseReady(); // This will now reject on timeout
-                    // If checkFirebaseReady resolves, db, userId, appId are now guaranteed to be set
-                }
-
+                // checkFirebaseReady will now reject on timeout or auth failure, handled by catch block.
+                await checkFirebaseReady(); 
+                
                 const date = meetingDate.value;
                 const time = meetingTime.value;
 
@@ -496,7 +487,7 @@
                 availabilityMessage.classList.remove('text-green-500', 'text-red-500');
                 availabilityMessage.classList.add('text-yellow-500');
 
-                // Now db, userId, appId should definitely be available if checkFirebaseReady passed
+                // db, userId, appId are now guaranteed to be available if checkFirebaseReady resolved
                 const meetingsRef = collection(db, 'artifacts', appId, 'public', 'data', 'bookedMeetings');
                 const q = query(meetingsRef, where('dateTime', '==', Timestamp.fromDate(selectedDateTime)));
                 const querySnapshot = await getDocs(q);
@@ -514,7 +505,8 @@
                 }
             } catch (error) {
                 console.error("Error checking meeting availability:", error);
-                availabilityMessage.textContent = `Error checking availability: ${error.message}. Try again later.`; // Show error message
+                // Display the specific error message from the rejection
+                availabilityMessage.textContent = `Error checking availability: ${error.message}. Please check console for details.`; 
                 availabilityMessage.classList.remove('text-green-500', 'text-yellow-500');
                 availabilityMessage.classList.add('text-red-500');
             }
@@ -677,9 +669,9 @@
                 stepIndicators[0].classList.add('bg-white', 'text-purple-700'); // Set first indicator active for next fill
 
             } catch (error) {
-                // Handle errors during form submission or Firebase booking
+                // This catch block now handles errors from checkFirebaseReady() as well.
                 console.error('Error submitting form or booking meeting:', error);
-                formMessage.textContent = 'There was an error submitting your request. Please try again.';
+                formMessage.textContent = `There was an error submitting your request: ${error.message}. Please try again.`;
                 formMessage.classList.remove('text-yellow-300', 'text-green-300');
                 formMessage.classList.add('text-red-300');
             }
