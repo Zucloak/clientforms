@@ -3,583 +3,725 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Client Order Form - SYNAPPSE</title>
+    <title>SYNAPPSE Order Request</title>
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts - Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!--
-        Content Security Policy (CSP):
-        This meta tag helps protect against Cross-Site Scripting (XSS) and data injection attacks
-        by restricting the sources from which the browser can load resources.
+    
+    <!-- Firebase SDK Initialization (Moved to external file) -->
+    <!-- You MUST create a file named firebase-init.js in the same directory -->
+    <!-- This file will contain the actual Firebase initialization code and config -->
+    <script type="module" src="./firebase-init.js"></script>
 
-        Updated for Google Apps Script (FormEasy backend).
-        'script.google.com' is allowed for script execution and form submissions.
-    -->
-    <meta http-equiv="Content-Security-Policy" content="
-        default-src 'self';
-        script-src 'self' https://cdn.tailwindcss.com 'unsafe-inline';
-        style-src 'self' https://fonts.googleapis.com https://cdn.tailwindcss.com 'unsafe-inline';
-        font-src 'self' https://fonts.gstatic.com;
-        connect-src 'self' https://script.google.com; /* Allow connections to Google Apps Script */
-        form-action https://script.google.com; /* Allow form submissions to Google Apps Script */
-    ">
     <style>
-        /* Custom scrollbar for a sleeker look */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
+        /* Keyframe animation for background gradient */
+        @keyframes gradientAnimation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
-        ::-webkit-scrollbar-track {
-            background: #374151; /* Darker gray for track */
-            border-radius: 10px;
+        /* Keyframe animation for subtle radial shine */
+        @keyframes radialShine {
+            0% { background-position: 50% 50%; background-size: 150% 150%; }
+            100% { background-position: 55% 45%; background-size: 160% 160%; } /* Slight movement and size change */
         }
-        ::-webkit-scrollbar-thumb {
-            background: #4b5563; /* Medium gray for thumb */
-            border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #6b7280; /* Lighter gray on hover */
+        /* Keyframe for success checkmark animation */
+        @keyframes drawCheck {
+            0% {
+                stroke-dashoffset: 1000;
+                opacity: 0;
+            }
+            100% {
+                stroke-dashoffset: 0;
+                opacity: 1;
+            }
         }
 
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #0d0f1a; /* Even darker charcoal background */
-            background-image: radial-gradient(at 50% 0%, #1a202c 0%, #0d0f1a 70%); /* Subtle radial gradient from top */
-            color: #e5e7eb; /* Light gray text */
-            display: flex;
-            justify-content: center;
-            align-items: flex-start; /* Align to top for longer forms */
-            min-height: 100vh;
-            /* Default padding for mobile-first approach */
-            padding: 1.5rem 0.5rem; /* 24px top/bottom, 8px left/right */
-            box-sizing: border-box;
-            /* Disable text selection */
-            -webkit-user-select: none; /* Safari */
-            -moz-user-select: none; /* Firefox */
-            -ms-user-select: none; /* IE 10+ */
-            user-select: none; /* Standard syntax */
+            /* Radial gradient for subtle shine + existing linear gradient */
+            background: radial-gradient(circle at center, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 40%),
+                        linear-gradient(-45deg, #6a0dad, #8a2be2, #9932cc, #da70d6);
+            background-size: 150% 150%, 400% 400%; /* Size for radial, then for linear gradient */
+            animation: radialShine 8s ease-in-out infinite alternate, gradientAnimation 15s ease infinite; /* Apply both animations */
+            color: #ffffff; /* White text for contrast */
+            overflow-x: hidden; /* Prevent horizontal scrollbars due to animations */
+        }
+        /* Custom styles for input, textarea, and select focus states */
+        input:focus, textarea:focus, select:focus {
+            outline: none; /* Remove default outline */
+            border-color: #fca311; /* Amber for focus border */
+            box-shadow: 0 0 0 3px rgba(252, 163, 17, 0.5); /* Shadow with amber tint */
+        }
+        /* Style for all form fields (input, textarea, select) */
+        .form-field {
+            background-color: rgba(255, 255, 255, 0.1); /* Slightly transparent white for fields */
+            border: 1px solid rgba(255, 255, 255, 0.3); /* Lighter border */
+            color: #ffffff; /* White text within fields */
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            transition: all 0.2s ease-in-out; /* Smooth transition for hover/focus */
+        }
+        .form-field::placeholder {
+            color: rgba(255, 255, 255, 0.7); /* Lighter placeholder text */
+        }
+        .form-field:hover {
+            background-color: rgba(255, 255, 255, 0.15); /* Slightly less transparent on hover */
+        }
+        .form-field:focus {
+            background-color: rgba(255, 255, 255, 0.2); /* Even less transparent on focus */
+        }
+        /* Specific style for custom select dropdown options */
+        .custom-dropdown-options {
+            background-color: #6a0dad; /* Darker background for options */
+        }
+        .custom-dropdown-options li:hover {
+            background-color: #8a2be2; /* Slightly lighter purple on hover */
         }
 
-        /* Adjust body padding for small screens and up */
-        @media (min-width: 640px) { /* sm breakpoint */
-            body {
-                padding: 2.5rem 1.5rem; /* Original padding for small screens and up */
-            }
-        }
-
-        .form-container {
-            position: relative;
-            width: 100%;
-            max-width: 48rem; /* Increased max-width for a slightly wider form */
-        }
-
-        @media (min-width: 768px) { /* md breakpoint */
-            .form-container {
-                /* No padding here as it's now handled by body or individual sections */
-            }
-        }
-
-        .form-header-gradient {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 24px; /* Taller gradient */
-            background: linear-gradient(to right, #3b82f6, #6366f1); /* Blue to indigo gradient for a more "techy" feel */
-            z-index: 0;
-            border-radius: 1rem 1rem 0 0; /* Apply border-radius only to the top of the gradient */
-        }
-
-        #dpa-section { /* DPA section retains its styles including border */
-            position: relative;
-            z-index: 10;
-            /* Default padding for mobile-first approach */
-            padding: 1.5rem; /* 24px all around */
-            background-color: #242b38; /* Darker blue-gray for sections */
-            border-radius: 0.75rem; /* More rounded */
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* More pronounced inner shadow */
-            transition: all 0.4s ease-in-out; /* Smoother transition */
-            border: 1px solid #374151; /* Clearer border */
-            margin-bottom: 2rem; /* Add margin below DPA section */
-        }
-
-        /* Adjust section padding for small screens and up */
-        @media (min-width: 640px) { /* sm breakpoint */
-            #dpa-section {
-                padding: 2rem; /* Original padding for small screens and up */
-            }
-        }
-
-        .section-title {
-            /* Default font size for mobile-first approach */
-            font-size: 1.375rem; /* 22px */
-            font-weight: 600; /* Semibold */
-            color: #e2e8f0; /* Ensure good contrast */
-            margin-bottom: 1.5rem; /* Adjusted margin */
-            border-bottom: 2px solid #3b82f6; /* Blue accent line */
-            padding-bottom: 0.75rem;
-        }
-
-        /* Adjust section title font size for small screens and up */
-        @media (min-width: 640px) { /* sm breakpoint */
-            .section-title {
-                font-size: 1.75rem; /* 28px */
-            }
-        }
-        /* Adjust section title font size for medium screens and up */
-        @media (min-width: 768px) { /* md breakpoint */
-            .section-title {
-                font-size: 2rem; /* Original size for medium screens and up */
-            }
-        }
-
-        .form-group {
-            margin-bottom: 1.75rem; /* Increased margin */
-        }
-
-        .form-label {
-            display: block;
-            color: #cbd5e0; /* Lighter gray label */
-            font-size: 0.9375rem; /* Slightly larger font */
-            font-weight: 500; /* Medium weight */
-            margin-bottom: 0.625rem; /* Adjusted margin */
-        }
-
-        .form-input,
-        .form-textarea {
-            width: 100%;
-            padding: 0.875rem; /* Increased padding */
-            background-color: #2d3748; /* Darker gray input */
-            border: 1px solid #4a5568; /* Clearer border */
-            border-radius: 0.5rem; /* More rounded */
-            outline: none;
-            transition: all 0.2s ease-in-out;
-            color: #e2e8f0;
-            font-size: 1rem;
-            placeholder-color: #6b7280;
-        }
-
-        .form-input:focus,
-        .form-textarea:focus {
-            border-color: #3b82f6; /* Blue border on focus */
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.4); /* Blue glow on focus */
-        }
-
-        .form-textarea {
-            min-height: 8rem; /* Minimum height for textarea */
-            resize: vertical; /* Allow vertical resizing */
-        }
-
-        .form-checkbox {
-            height: 1.25rem; /* Increased size */
-            width: 1.25rem; /* Increased size */
-            color: #3b82f6; /* Blue checkbox */
-            background-color: #374151;
-            border: 1px solid #4b5563;
-            border-radius: 0.25rem;
-            transition: all 0.15s ease-in-out;
-        }
-        .form-checkbox:focus {
-            ring: 3px;
-            ring-offset: 2px;
-            ring-offset-color: #1a202c;
-            ring-color: #3b82f6;
-        }
-
-        .agree-label {
-            margin-left: 0.75rem; /* Adjusted margin */
-            color: #d1d5db;
-            font-size: 1rem;
-            cursor: pointer;
-            user-select: none;
-        }
-
-        .button {
-            width: 100%;
-            padding: 1rem 1.75rem; /* Increased padding */
-            background: linear-gradient(to right, #3b82f6, #2563eb); /* Vibrant blue gradient */
-            color: #f9fafb; /* Off-white text */
-            font-weight: 700; /* Bold */
-            font-size: 1.125rem; /* Larger font size */
-            border-radius: 0.625rem; /* More rounded */
-            box-shadow: 0 8px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1); /* Stronger initial shadow */
-            transition: all 0.3s ease-in-out;
-            transform: translateY(0) scale(1);
-            outline: none;
-            border: none;
-            cursor: pointer;
-        }
-
-        .button:hover {
-            background: linear-gradient(to right, #60a5fa, #3b82f6); /* Lighter gradient on hover */
-            transform: translateY(-2px) scale(1.01); /* Slight lift and scale */
-            box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.3), 0 6px 10px -3px rgba(0, 0, 0, 0.15); /* More dramatic shadow on hover */
-        }
-
-        .button:active {
-            background: linear-gradient(to right, #2563eb, #1d4ed8); /* Darker gradient on active */
-            transform: translateY(0) scale(0.99); /* Slight press effect */
-            box-shadow: 0 4px 8px -2px rgba(0, 0, 0, 0.15), 0 2px 4px -1px rgba(0, 0, 0, 0.08);
-        }
-
-        .button:disabled {
-            background: #4b5563;
-            cursor: not-allowed;
-            opacity: 0.6; /* Reduced opacity */
-            transform: none;
-            box-shadow: none;
-        }
-
-        /* Message box styles are mostly removed as Formspree handles redirect */
-        #message-box {
-            display: none; /* Hide the message box for Formspree */
-        }
-
-        /* Styles for the custom message box */
-        .message-box-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
-        }
-
-        .message-box-overlay.visible {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .message-box-content {
-            background-color: #242b38;
-            padding: 2rem;
-            border-radius: 0.75rem;
-            box-shadow: 0 15px 25px rgba(0, 0, 0, 0.3);
-            text-align: center;
-            max-width: 400px;
-            width: 90%;
-            transform: translateY(-20px);
-            opacity: 0;
-            transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
-        }
-
-        .message-box-overlay.visible .message-box-content {
-            transform: translateY(0);
-            opacity: 1;
-        }
-
-        .message-box-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: #e2e8f0;
-            margin-bottom: 1rem;
-        }
-
-        .message-box-text {
-            font-size: 1rem;
-            color: #cbd5e0;
-            margin-bottom: 1.5rem;
-        }
-
-        .message-box-close-button {
-            background: linear-gradient(to right, #3b82f6, #2563eb);
-            color: #f9fafb;
+        /* Styling for primary button */
+        .btn-primary {
+            background-color: #fca311; /* Amber */
+            color: #212529; /* Dark text for contrast */
             padding: 0.75rem 1.5rem;
             border-radius: 0.5rem;
             font-weight: 600;
-            border: none;
-            cursor: pointer;
-            transition: background 0.3s ease, transform 0.2s ease;
+            transition: all 0.2s ease-in-out;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
-
-        .message-box-close-button:hover {
-            background: linear-gradient(to right, #60a5fa, #3b82f6);
-            transform: translateY(-1px);
+        .btn-primary:hover {
+            background-color: #e69500; /* Darker amber on hover */
+            transform: translateY(-2px); /* Slight lift effect */
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+        }
+        /* Styling for secondary button */
+        .btn-secondary {
+            background-color: rgba(255, 255, 255, 0.2); /* Transparent white */
+            color: #ffffff;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: all 0.2s ease-in-out;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .btn-secondary:hover {
+            background-color: rgba(255, 255, 255, 0.3); /* Slightly less transparent on hover */
+            transform: translateY(-2px); /* Slight lift effect */
         }
     </style>
 </head>
-<body class="antialiased">
-    <div class="form-container">
-        <div id="dpa-section" class="opacity-100 scale-100">
-            <h2 class="text-2xl md:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-500 mb-6 text-center">Data Privacy Agreement</h2>
-            <p class="text-gray-300 mb-4 leading-relaxed text-sm md:text-base">
-                In compliance with the Republic Act No. 10173, also known as the Data Privacy Act of 2012 of the Philippines, we are committed to protecting your personal information.
-            </p>
-            <p class="text-gray-300 mb-4 leading-relaxed text-sm md:text-base">
-                By proceeding with this form, you agree that SYNAPPSE may collect, use, process, and store the personal data you provide for the purpose of processing your order, communicating updates, and maintaining a record of our transactions. This includes your name, contact details, and social media handles.
-            </p>
-            <p class="text-gray-300 mb-6 leading-relaxed text-sm md:text-base">
-                Your data will be kept confidential and will not be shared with third parties without your explicit consent, except as required by law. You have the right to access, correct, or delete your personal information held by us. For more details, please refer to our full Privacy Policy.
-            </p>
-            <div class="flex items-center mb-6">
-                <input type="checkbox" id="agree-dpa" class="form-checkbox">
-                <label for="agree-dpa" class="agree-label">
-                    I have read and agree to the <span class="text-blue-400 hover:text-blue-300 font-medium">Data Privacy Agreement</span> and <span class="text-blue-400 hover:text-blue-300 font-medium">Terms & Conditions</span>.
-                </label>
-            </div>
-            <button id="proceed-button" class="button" disabled>
-                Proceed to Form
-            </button>
-        </div>
-
-        <form id="order-form" class="hidden opacity-0 translate-y-4" action="https://script.google.com/macros/s/AKfycby8oSjmUDlyGVxfMh3HeSFKNrmCiLzZ-Egpre59xDfg26lJNutgtIE3MKadpRaI9MQ/exec" method="POST">
-            <h1 class="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-500 mb-6 text-center drop-shadow-lg">
-                SYNAPPSE Order Request
-            </h1>
-
-            <div class="mb-6">
-                <h2 class="section-title">Order Details</h2>
-                <div class="form-group">
-                    <label for="order-type" class="form-label">Type of Order <span class="text-red-400">*</span></label>
-                    <input type="text" id="order-type" name="Order Type" required class="form-input" placeholder="e.g., Custom Illustration, Website Design, Video Editing">
-                </div>
-                <div class="form-group">
-                    <label for="order-description" class="form-label">Detailed Description <span class="text-red-400">*</span></label>
-                    <textarea id="order-description" name="Description" rows="4" required class="form-textarea" placeholder="Please provide as much detail as possible about your project, including specific requirements, desired outcomes, and any reference materials."></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="Schedule a Meeting" class="form-label">Schedule a Meeting</label>
-                    <input type="date" id="Schedule a Meeting" name="Schedule a Meeting" class="form-input">
-                </div>
-            </div>
-
-            <div class="mb-6">
-                <h2 class="section-title">Client Information</h2>
-                <div class="form-group">
-                    <label for="full-name" class="form-label">Full Name <span class="text-red-400">*</span></label>
-                    <input type="text" id="full-name" name="Full Name" required class="form-input" placeholder="Juan dela cruz">
-                </div>
-                <div class="form-group">
-                    <label for="email" class="form-label">Email Address <span class="text-red-400">*</span></label>
-                    <input type="email" id="email" name="Email" required class="form-input" placeholder="your.email@example.com">
-                </div>
-                <div class="form-group">
-                    <label for="phone" class="form-label">Phone Number <span class="text-red-400">*</span></label>
-                    <input type="tel" id="phone" name="Phone Number" required class="form-input" placeholder="+63 9XX XXX XXXX">
-                </div>
-            </div>
-
-            <div class="mb-6">
-                <h2 class="section-title">Social Media & Links <span class="text-gray-400 text-sm">(Optional)</span></h2>
-                <p class="text-gray-400 text-sm mb-2">Provide links or usernames to help us understand your brand or connect with you.</p>
-                <div class="form-group">
-                    <label for="facebook" class="form-label">Facebook Profile/Page</label>
-                    <input type="text" id="facebook" name="Facebook Profile" class="form-input" placeholder="https://facebook.com/yourpage or @yourusername">
-                </div>
-                <div class="form-group">
-                    <label for="instagram" class="form-label">Instagram Handle</label>
-                    <input type="text" id="instagram" name="Instagram Handle" class="form-input" placeholder="@yourinstagram">
-                </div>
-                <div class="form-group">
-                    <label for="twitter" class="form-label">Twitter/X Handle</label>
-                    <input type="text" id="twitter" name="Twitter Handle" class="form-input" placeholder="@yourtwitter">
-                </div>
-            </div>
-
-            <!-- Honeypot field for bot detection -->
-            <div style="position: absolute; left: -9999px;">
-                <input type="text" name="hp_email" tabindex="-1" autocomplete="off">
-            </div>
-
-            <button type="submit" id="submit-button" class="button">
-                Submit Order Request
-            </button>
-        </form>
-
-        <!-- Custom Message Box for DPA and other client-side messages -->
-        <div id="message-box-overlay" class="message-box-overlay">
-            <div class="message-box-content">
-                <h3 id="message-box-title" class="message-box-title"></h3>
-                <p id="message-box-text" class="message-box-text"></p>
-                <button id="message-box-close" class="message-box-close-button">
-                    Close
-                </button>
-            </div>
-        </div>
-
+<body class="flex flex-col items-center justify-center min-h-screen p-4 sm:p-6 md:p-8">
+    <!-- Firebase Status Indicator -->
+    <div id="firebaseStatus" class="mb-4 text-center text-sm font-medium text-red-500">
+        Connecting to Firebase...
     </div>
 
-    <script>
-        // Make sure this API endpoint EXACTLY matches your deployed Google Apps Script Web App URL.
-        const FORMEASY_API_ENDPOINT = 'https://script.google.com/macros/s/AKfycby8oSjmUDlyGVxfMh3HeSFKNrmCiLzZ-Egpre59xDfg26lJNutgtIE3MKadpRaI9MQ/exec';
+    <!-- Main form container with responsive styling and background -->
+    <div id="formContainer" class="w-full max-w-4xl mx-auto bg-purple-900 bg-opacity-70 rounded-xl shadow-2xl p-6 sm:p-10 space-y-8">
+        <h1 class="text-4xl sm:text-5xl font-extrabold text-white text-center mb-6 drop-shadow-lg">SYNAPPSE Order Request</h1>
+        
+        <!-- Progress Indicator for multi-step form -->
+        <div class="flex justify-center space-x-2 sm:space-x-4 mb-8">
+            <div id="step-indicator-1" class="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-sm sm:text-base font-bold bg-white text-purple-700 shadow-md">1</div>
+            <div id="step-indicator-2" class="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-sm sm:text-base font-bold bg-gray-300 text-gray-700 shadow-md">2</div>
+            <div id="step-indicator-3" class="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-sm sm:text-base font-bold bg-gray-300 text-gray-700 shadow-md">3</div>
+        </div>
 
-        const agreeDpaCheckbox = document.getElementById('agree-dpa');
-        const proceedButton = document.getElementById('proceed-button');
-        const dpaSection = document.getElementById('dpa-section');
-        const orderForm = document.getElementById('order-form');
-        const submitButton = document.getElementById('submit-button');
-        const messageBoxOverlay = document.getElementById('message-box-overlay');
-        const messageBoxTitle = document.getElementById('message-box-title');
-        const messageBoxText = document.getElementById('message-box-text');
-        const messageBoxClose = document.getElementById('message-box-close');
+        <form id="orderForm" class="space-y-6">
+            <!-- Step 1: Order Details -->
+            <div id="step1" class="form-step">
+                <h3 class="text-2xl sm:text-3xl font-bold text-white mb-6 text-center">Order Details</h3>
+                <p class="text-sm text-gray-200 text-center mb-8">All fields in this section are required.</p>
 
-        // Client-side rate limiting variables
-        const SUBMISSION_COOLDOWN_TIME_MS = 5000; // 5 seconds cooldown
-        let lastSubmissionTime = 0;
+                <div class="relative">
+                    <label for="typeOfOrder" class="block text-base font-medium text-gray-100 mb-2">Type of Order</label>
+                    <div id="customDropdownButton" class="mt-1 block w-full form-field cursor-pointer flex justify-between items-center" tabindex="0" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-controls="dropdownOptions">
+                        <span id="selectedOptionText">Select Order Type</span>
+                        <svg class="w-5 h-5 text-white transform transition-transform duration-200" id="dropdownArrow" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </div>
+                    <input type="hidden" id="typeOfOrder" name="typeOfOrder" required value="">
+                    
+                    <ul id="dropdownOptions" class="absolute z-10 w-full mt-1 rounded-md shadow-lg overflow-hidden hidden custom-dropdown-options" role="listbox" aria-labelledby="customDropdownButton">
+                        <li class="px-4 py-2 cursor-pointer text-white" data-value="Branding">Branding</li>
+                        <li class="px-4 py-2 cursor-pointer text-white" data-value="Web Design">Web Design</li>
+                        <li class="px-4 py-2 cursor-pointer text-white" data-value="Marketing Campaign">Marketing Campaign</li>
+                        <li class="px-4 py-2 cursor-pointer text-white" data-value="Content Creation">Content Creation</li>
+                        <li class="px-4 py-2 cursor-pointer text-white" data-value="Market Research">Market Research</li>
+                        <li class="px-4 py-2 cursor-pointer text-white" data-value="System Development">System Development</li>
+                        <li class="px-4 py-2 cursor-pointer text-white" data-value="Printed Materials">Printed Materials</li>
+                        <li class="px-4 py-2 cursor-pointer text-white" data-value="Personal Websites">Personal Websites</li>
+                        <li class="px-4 py-2 cursor-pointer text-white" data-value="Other">Other</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <label for="detailedDescription" class="block text-base font-medium text-gray-100 mb-2">Detailed Description</label>
+                    <textarea id="detailedDescription" name="detailedDescription" rows="6" placeholder="Provide a detailed description of your project or request..." required
+                                  class="mt-1 block w-full form-field"></textarea>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label for="meetingDate" class="block text-base font-medium text-gray-100 mb-2">Schedule a Meeting - Date</label>
+                        <input type="date" id="meetingDate" name="meetingDate" required
+                               class="mt-1 block w-full form-field">
+                    </div>
+                    <div>
+                        <label for="meetingTime" class="block text-base font-medium text-gray-100 mb-2">Schedule a Meeting - Time</label>
+                        <input type="time" id="meetingTime" name="meetingTime" required
+                               class="mt-1 block w-full form-field">
+                    </div>
+                </div>
+                <button type="button" id="checkAvailabilityBtn" class="btn-secondary w-full sm:w-auto mt-4">Check Availability</button>
+                <div id="availabilityMessage" class="mt-2 text-sm font-semibold text-center"></div>
+
+                <div class="flex justify-end mt-8">
+                    <button type="button" id="next1" class="btn-primary">Next</button>
+                </div>
+            </div>
+
+            <!-- Step 2: Client Information -->
+            <div id="step2" class="form-step hidden">
+                <h3 class="text-2xl sm:text-3xl font-bold text-white mb-6 text-center">Client Information</h3>
+                <p class="text-sm text-gray-200 text-center mb-8">All fields in this section are required.</p>
+
+                <div>
+                    <label for="fullName" class="block text-base font-medium text-gray-100 mb-2">Full Name</label>
+                    <input type="text" id="fullName" name="fullName" placeholder="Your Full Name" required
+                           class="mt-1 block w-full form-field">
+                </div>
+
+                <div>
+                    <label for="emailAddress" class="block text-base font-medium text-gray-100 mb-2">Email Address</label>
+                    <input type="email" id="emailAddress" name="emailAddress" placeholder="you@example.com" required
+                           class="mt-1 block w-full form-field">
+                </div>
+
+                <div>
+                    <label for="phoneNumber" class="block text-base font-medium text-gray-100 mb-2">Phone Number</label>
+                    <input type="text" id="phoneNumber" name="phoneNumber" placeholder="+63 9XX XXX XXXX" required
+                           class="mt-1 block w-full form-field"
+                           oninput="this.value=this.value.replace(/[^0-9]/g,'');" maxlength="15">
+                </div>
+
+                <div class="flex justify-between mt-8">
+                    <button type="button" id="prev2" class="btn-secondary">Previous</button>
+                    <button type="button" id="next2" class="btn-primary">Next</button>
+                </div>
+            </div>
+
+            <!-- Step 3: Social Media and Links -->
+            <div id="step3" class="form-step hidden">
+                <h3 class="text-2xl sm:text-3xl font-bold text-white mb-6 text-center">Social Media and Links</h3>
+                <p class="text-sm text-gray-200 text-center mb-8">All fields in this section are optional.</p>
+
+                <div>
+                    <label for="facebookProfile" class="block text-base font-medium text-gray-100 mb-2">Facebook Profile/Page URL</label>
+                    <input type="url" id="facebookProfile" name="facebookProfile" placeholder="https://facebook.com/yourpage"
+                           class="mt-1 block w-full form-field">
+                </div>
+
+                <div>
+                    <label for="instagramHandle" class="block text-base font-medium text-gray-100 mb-2">Instagram Handle</label>
+                    <input type="text" id="instagramHandle" name="instagramHandle" placeholder="@yourinstagram"
+                           class="mt-1 block w-full form-field">
+                </div>
+
+                <div>
+                    <label for="twitterHandle" class="block text-base font-medium text-gray-100 mb-2">Twitter/X Handle</label>
+                    <input type="text" id="twitterHandle" name="twitterHandle" placeholder="@yourtwitterx"
+                           class="mt-1 block w-full form-field">
+                </div>
+
+                <div class="flex justify-between mt-8">
+                    <button type="button" id="prev3" class="btn-secondary">Previous</button>
+                    <button type="submit" class="btn-primary">Submit Order Request</button>
+                </div>
+            </div>
+
+            <div id="formMessage" class="mt-4 text-center text-sm font-medium text-white"></div>
+        </form>
+    </div>
+
+    <!-- Success Message Container (Initially Hidden) -->
+    <div id="successMessageContainer" class="w-full max-w-4xl mx-auto bg-purple-900 bg-opacity-70 rounded-xl shadow-2xl p-6 sm:p-10 space-y-8 hidden flex flex-col items-center justify-center text-center">
+        <svg class="w-32 h-32 text-green-400 mb-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation: drawCheck 1s forwards ease-out;">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-8.87"></path>
+            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+        </svg>
+        <h2 class="text-4xl sm:text-5xl font-extrabold text-white mb-4 drop-shadow-lg">Thank You!</h2>
+        <p class="text-lg text-gray-200 mb-8">Your order request has been submitted successfully. Here are the details:</p>
+        <div id="submittedDetails" class="text-left text-gray-200 w-full max-w-md">
+            <!-- Submitted details will be inserted here -->
+        </div>
+        <button type="button" id="fillAgainBtn" class="btn-primary mt-8">Fill Another Request</button>
+    </div>
+
+    <script type="module">
+        // Import necessary Firebase modules for this script block
+        import { collection, query, where, getDocs, addDoc, Timestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Declare global Firebase variables to be populated from the initial script block (firebase-init.js)
+        let db;
+        let userId;
+        let appId;
+        // Timestamp is already imported above, so no need to redeclare here.
 
         /**
-         * Displays a custom message box to the user.
-         * @param {string} title - The title of the message box.
-         * @param {string} content - The content/body of the message.
+         * Checks if Firebase is initialized and its global variables are available.
+         * Resolves when ready, or after a timeout if not.
+         * @returns {Promise<void>}
          */
-        function showMessageBox(title, content) {
-            messageBoxTitle.textContent = title;
-            messageBoxText.textContent = content;
-            messageBoxOverlay.classList.add('visible');
-        }
-
-        /**
-         * Hides the custom message box.
-         */
-        function hideMessageBox() {
-            messageBoxOverlay.classList.remove('visible');
-        }
-
-        // Event listener for closing the message box
-        messageBoxClose.addEventListener('click', hideMessageBox);
-        messageBoxOverlay.addEventListener('click', function(event) {
-            // Close if clicked outside the content box
-            if (event.target === messageBoxOverlay) {
-                hideMessageBox();
-            }
-        });
-
-        // Toggle proceed button based on DPA checkbox
-        agreeDpaCheckbox.addEventListener('change', function() {
-            if (this.checked) {
-                proceedButton.disabled = false;
-                proceedButton.classList.remove('opacity-50', 'cursor-not-allowed');
-                proceedButton.classList.add('hover:scale-105');
-            } else {
-                proceedButton.disabled = true;
-                proceedButton.classList.add('opacity-50', 'cursor-not-allowed');
-                proceedButton.classList.remove('hover:scale-105');
-            }
-        });
-
-        // Handle proceed button click
-        proceedButton.addEventListener('click', function() {
-            if (agreeDpaCheckbox.checked) {
-                // Animate DPA section out
-                dpaSection.classList.add('opacity-0', 'scale-95');
+        const checkFirebaseReady = () => {
+            return new Promise(resolve => {
+                const interval = setInterval(() => {
+                    // Check if all necessary Firebase globals are available on the window object
+                    if (window.db && window.userId && window.appId) {
+                        db = window.db;
+                        userId = window.userId;
+                        appId = window.appId;
+                        clearInterval(interval); // Stop checking once ready
+                        console.log("Firebase globals are ready in main script.");
+                        resolve();
+                    }
+                }, 100); // Check every 100ms
+                // Add a timeout to prevent infinite loops if Firebase fails to load
                 setTimeout(() => {
-                    dpaSection.classList.add('hidden');
-                    // Animate order form in
-                    orderForm.classList.remove('hidden');
-                    setTimeout(() => {
-                        orderForm.classList.remove('opacity-0', 'translate-y-4');
-                    }, 50); // Small delay to allow 'hidden' class to apply before starting transition
-                }, 400); // Wait for DPA section fade-out transition
-            } else {
-                showMessageBox('Agreement Required', 'Please agree to the Data Privacy Agreement and Terms & Conditions to proceed.');
-            }
-        });
-
-        // Add input sanitization for all text and textarea inputs
-        document.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], textarea').forEach(input => {
-            input.addEventListener('paste', function(event) {
-                event.preventDefault(); // Prevent default paste behavior
-                const text = event.clipboardData.getData('text/plain'); // Get plain text from clipboard
-                // Sanitize the pasted text: remove any HTML tags
-                const sanitizedText = text.replace(/<[^>]*>?/gm, '');
-                // Insert sanitized text at the current cursor position
-                const start = this.selectionStart;
-                const end = this.selectionEnd;
-                this.value = this.value.substring(0, start) + sanitizedText + this.value.substring(end);
-                this.setSelectionRange(start + sanitizedText.length, start + sanitizedText.length);
-                this.dispatchEvent(new Event('input', { bubbles: true })); // Trigger input event for validation/other handlers
+                    if (!window.db || !window.userId || !window.appId) {
+                        clearInterval(interval);
+                        console.error("Firebase globals not ready after timeout.");
+                        resolve(); // Resolve anyway to avoid blocking the app
+                    }
+                }, 5000); // 5 seconds timeout
             });
+        };
+        
+        // Get form and message elements
+        const formContainer = document.getElementById('formContainer'); // Main container for the form
+        const successMessageContainer = document.getElementById('successMessageContainer'); // New success message container
+        const submittedDetailsDiv = document.getElementById('submittedDetails'); // Div to display submitted details
+        const form = document.getElementById('orderForm');
+        const formMessage = document.getElementById('formMessage');
 
-            // Basic input validation on input event (can be expanded)
-            input.addEventListener('input', function() {
-                // Example: Prevent leading/trailing whitespace
-                // This is a simple client-side measure; server-side is essential
-                if (this.value.length > 0 && (this.value.startsWith(' ') || this.value.endsWith(' '))) {
-                    this.value = this.value.trim();
+        // Get form step elements and step indicator elements
+        const step1 = document.getElementById('step1');
+        const step2 = document.getElementById('step2');
+        const step3 = document.getElementById('step3');
+        const stepIndicators = [
+            document.getElementById('step-indicator-1'),
+            document.getElementById('step-indicator-2'),
+            document.getElementById('step-indicator-3')
+        ];
+
+        let currentStep = 1; // Track the current active step
+
+        // Form Elements for Validation - references to input fields
+        // Note: typeOfOrder is now managed by a custom dropdown
+        const detailedDescription = document.getElementById('detailedDescription');
+        const meetingDate = document.getElementById('meetingDate');
+        const meetingTime = document.getElementById('meetingTime');
+        const fullName = document.getElementById('fullName');
+        const emailAddress = document.getElementById('emailAddress');
+        const phoneNumber = document.getElementById('phoneNumber');
+
+        // Meeting Availability Elements
+        const checkAvailabilityBtn = document.getElementById('checkAvailabilityBtn');
+        const availabilityMessage = document.getElementById('availabilityMessage');
+        const fillAgainBtn = document.getElementById('fillAgainBtn'); // New button
+
+        // Custom Dropdown Elements
+        const customDropdownButton = document.getElementById('customDropdownButton');
+        const selectedOptionText = document.getElementById('selectedOptionText');
+        const dropdownOptions = document.getElementById('dropdownOptions');
+        const dropdownArrow = document.getElementById('dropdownArrow');
+        const typeOfOrderHiddenInput = document.getElementById('typeOfOrder'); // Hidden input for value
+
+
+        // IMPORTANT: Replace with your deployed FormEasy Apps Script Web App URL
+        // This endpoint is used to submit form data to a Google Sheet via Google Apps Script.
+        const FORM_EASY_ENDPOINT = 'https://script.google.com/macros/s/AKfycbzZM7f-hnDPnMJVPu7FrEsrWTDqHSMIsiOpNguIyqcIYZeKGbl1H0jUWrI_g77YAnTPBg/exec'; 
+
+        /**
+         * Updates the visual appearance of the step indicators based on the current step.
+         */
+        function updateStepIndicators() {
+            stepIndicators.forEach((indicator, index) => {
+                if (index + 1 === currentStep) {
+                    // Current step: white background, purple text
+                    indicator.classList.add('bg-white', 'text-purple-700');
+                    indicator.classList.remove('bg-gray-300', 'text-gray-700', 'bg-purple-400', 'text-white');
+                } else if (index + 1 < currentStep) {
+                    // Completed step: purple background, white text
+                    indicator.classList.add('bg-purple-400', 'text-white');
+                    indicator.classList.remove('bg-white', 'text-purple-700', 'bg-gray-300', 'text-gray-700');
+                } else {
+                    // Future step: gray background, gray text
+                    indicator.classList.add('bg-gray-300', 'text-gray-700');
+                    indicator.classList.remove('bg-white', 'text-purple-700', 'bg-purple-400', 'text-white');
                 }
             });
+        }
+
+        /**
+         * Shows a specific form step and hides others.
+         * @param {number} stepNum - The step number to show (1, 2, or 3).
+         */
+        function showStep(stepNum) {
+            // Hide all steps first
+            step1.classList.add('hidden');
+            step2.classList.add('hidden');
+            step3.classList.add('hidden');
+            
+            // Show the requested step
+            switch(stepNum) {
+                case 1: step1.classList.remove('hidden'); break;
+                case 2: step2.classList.remove('hidden'); break;
+                case 3: step3.classList.remove('hidden'); break;
+            }
+            currentStep = stepNum; // Update current step tracker
+            updateStepIndicators(); // Update visual indicators
+        }
+
+        // Initial display when the page loads
+        showStep(1);
+
+        /**
+         * Validates fields in Step 1.
+         * @returns {boolean} True if all required fields in Step 1 are valid and availability is confirmed, false otherwise.
+         */
+        function validateStep1() {
+            // Clear any previous messages
+            formMessage.textContent = '';
+            formMessage.classList.remove('text-red-300', 'text-green-300', 'text-yellow-300');
+
+            // Check HTML5 validation for required fields in Step 1
+            const requiredFields1 = [detailedDescription, meetingDate, meetingTime]; 
+            for (const field of requiredFields1) {
+                if (!field.checkValidity()) {
+                    field.reportValidity(); // Show native browser error
+                    formMessage.textContent = `Please fill out the "${field.previousElementSibling.textContent.trim()}" field.`;
+                    formMessage.classList.add('text-red-300');
+                    return false;
+                }
+            }
+
+            // Custom validation for the custom dropdown
+            if (!typeOfOrderHiddenInput.value) { // Use the hidden input's value for validation
+                formMessage.textContent = 'Please select a "Type of Order".';
+                formMessage.classList.add('text-red-300');
+                customDropdownButton.focus(); // Set focus to the dropdown button
+                return false;
+            }
+
+
+            // Check if meeting availability has been checked and is positive
+            if (!availabilityMessage.classList.contains('text-green-500')) {
+                formMessage.textContent = 'Please check meeting availability and ensure the selected slot is available.';
+                formMessage.classList.add('text-red-300');
+                return false;
+            }
+            return true;
+        }
+
+        /**
+         * Validates fields in Step 2.
+         * @returns {boolean} True if all required fields in Step 2 are valid, false otherwise.
+         */
+        function validateStep2() {
+            // Clear any previous messages
+            formMessage.textContent = '';
+            formMessage.classList.remove('text-red-300', 'text-green-300', 'text-yellow-300');
+
+            const requiredFields2 = [fullName, emailAddress, phoneNumber];
+            for (const field of requiredFields2) {
+                if (!field.checkValidity()) {
+                    field.reportValidity(); // Show native browser error
+                    formMessage.textContent = `Please fill out the "${field.previousElementSibling.textContent.trim()}" field.`;
+                    formMessage.classList.add('text-red-300');
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        // Event Listeners for Navigation Buttons
+        document.getElementById('next1').addEventListener('click', () => {
+            if (validateStep1()) {
+                showStep(2); // Move to Step 2 if Step 1 is valid
+            }
         });
 
+        document.getElementById('prev2').addEventListener('click', () => {
+            showStep(1); // Go back to Step 1
+        });
 
-        // Handle form submission with client-side rate limiting and fetch API
-        orderForm.addEventListener('submit', async function(event) {
-            event.preventDefault(); // Prevent default form submission
+        document.getElementById('next2').addEventListener('click', () => {
+            if (validateStep2()) {
+                showStep(3); // Move to Step 3 if Step 2 is valid
+            }
+        });
 
-            const currentTime = Date.now();
-            if (currentTime - lastSubmissionTime < SUBMISSION_COOLDOWN_TIME_MS) {
-                showMessageBox('Too Many Requests', `Please wait ${((SUBMISSION_COOLDOWN_TIME_MS - (currentTime - lastSubmissionTime)) / 1000).toFixed(1)} seconds before submitting again.`);
+        document.getElementById('prev3').addEventListener('click', () => {
+            showStep(2); // Go back to Step 2
+        });
+
+        // Firebase Meeting Availability Check
+        checkAvailabilityBtn.addEventListener('click', async () => {
+            // Ensure Firebase is ready before attempting database operations
+            if (!db || !userId || !appId) {
+                availabilityMessage.textContent = 'Firebase not ready. Please wait...';
+                availabilityMessage.classList.remove('text-green-500', 'text-red-500');
+                availabilityMessage.classList.add('text-yellow-500');
+                await checkFirebaseReady(); // Wait for Firebase to be ready
+                if (!db || !userId || !appId) {
+                    // If still not ready after waiting, show error
+                    availabilityMessage.textContent = 'Firebase connection failed. Try reloading.';
+                    availabilityMessage.classList.remove('text-green-500', 'text-yellow-500');
+                    availabilityMessage.classList.add('text-red-500');
+                    return;
+                }
+            }
+
+            const date = meetingDate.value;
+            const time = meetingTime.value;
+
+            // Validate if date and time are selected
+            if (!date || !time) {
+                availabilityMessage.textContent = 'Please select both date and time.';
+                availabilityMessage.classList.remove('text-green-500', 'text-yellow-500');
+                availabilityMessage.classList.add('text-red-500');
                 return;
             }
 
-            lastSubmissionTime = currentTime; // Update last submission time
+            // Combine date and time into a single Date object for Firestore comparison
+            const selectedDateTime = new Date(`${date}T${time}:00`);
 
-            // Disable button immediately after submission to prevent double clicks
-            submitButton.disabled = true;
-            submitButton.textContent = 'Submitting...'; // Provide feedback
-            submitButton.classList.add('opacity-50', 'cursor-not-allowed');
-
-            const formData = new FormData(orderForm);
-            // Convert FormData to URL-encoded string
-            const urlEncodedData = new URLSearchParams(formData).toString();
-
-            // Log the endpoint and data just before fetch for debugging
-            console.log('Attempting fetch to:', FORMEASY_API_ENDPOINT);
-            console.log('Sending data:', urlEncodedData);
+            // Show checking message
+            availabilityMessage.textContent = 'Checking availability...';
+            availabilityMessage.classList.remove('text-green-500', 'text-red-500');
+            availabilityMessage.classList.add('text-yellow-500');
 
             try {
-                const response = await fetch(FORMEASY_API_ENDPOINT, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    },
-                    body: urlEncodedData, // Send as URL-encoded string
-                    mode: 'cors' // Ensure CORS mode is used
-                });
+                // Query Firestore for existing meetings at the selected dateTime
+                // Path: /artifacts/{appId}/public/data/bookedMeetings
+                const meetingsRef = collection(db, 'artifacts', appId, 'public', 'data', 'bookedMeetings');
+                // Use Timestamp for query as Firebase stores Date objects as Timestamps
+                const q = query(meetingsRef, where('dateTime', '==', Timestamp.fromDate(selectedDateTime)));
+                const querySnapshot = await getDocs(q);
 
-                // Log response headers for debugging
-                console.log('Response Headers:', Object.fromEntries(response.headers.entries()));
-
-                if (response.ok) {
-                    const responseText = await response.text(); // Get the raw response text
-                    console.log('Form submission successful. Raw Response from Apps Script:', responseText);
-                    showMessageBox('Success!', 'Your order request has been submitted successfully. We will get back to you shortly.');
-                    orderForm.reset(); // Clear the form fields
+                if (querySnapshot.empty) {
+                    // Slot is available
+                    availabilityMessage.textContent = '✅ This slot is available!';
+                    availabilityMessage.classList.remove('text-red-500', 'text-yellow-500');
+                    availabilityMessage.classList.add('text-green-500');
                 } else {
-                    const errorText = await response.text();
-                    console.error('Form submission failed (HTTP Status ' + response.status + '):', errorText);
-                    showMessageBox('Submission Failed', `There was an error submitting your form: ${response.status} - ${errorText || 'Unknown Error'}. Please check your Apps Script setup.`);
+                    // Slot is already booked
+                    availabilityMessage.textContent = '❌ This slot is already booked. Please choose another time.';
+                    availabilityMessage.classList.remove('text-green-500', 'text-yellow-500');
+                    availabilityMessage.classList.add('text-red-500');
                 }
             } catch (error) {
-                // This catch block means the fetch operation itself failed (e.g., network down, CORS blocked by browser, or very unexpected response type)
-                console.error('Network error during form submission (Failed to fetch):', error);
-                showMessageBox('Network Error', 'Could not connect to the Google Apps Script server. Please check your internet connection and verify the API endpoint. Also, check your browser\'s console and network tab for more details.');
-            } finally {
-                submitButton.disabled = false;
-                submitButton.textContent = 'Submit Order Request';
-                submitButton.classList.remove('opacity-50', 'cursor-not-allowed');
+                // Handle errors during availability check
+                console.error("Error checking meeting availability:", error);
+                availabilityMessage.textContent = 'Error checking availability. Try again later.';
+                availabilityMessage.classList.remove('text-green-500', 'text-yellow-500');
+                availabilityMessage.classList.add('text-red-500');
             }
         });
 
-        // Code Protection: Disable right-click and common copy shortcuts
-        document.addEventListener('contextmenu', event => event.preventDefault());
+        // Function to convert 24-hour time to 12-hour AM/PM format
+        function formatTimeForDisplay(time24h) {
+            if (!time24h) return '';
+            const [hours, minutes] = time24h.split(':').map(Number);
+            const period = hours >= 12 ? 'PM' : 'AM';
+            const formattedHours = hours % 12 || 12; // Convert 0 (midnight) to 12 AM, and hours > 12 to 12-hour format
+            return `${formattedHours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')} ${period}`;
+        }
 
-        document.addEventListener('keydown', event => {
-            if ((event.ctrlKey || event.metaKey) && ['c', 'x', 'a', 'u'].includes(event.key.toLowerCase())) {
-                event.preventDefault();
-            }
-            if (event.key === 'F12' || (event.metaKey && event.altKey && event.key === 'i')) {
-                event.preventDefault();
-            }
-            if (event.key === 'F10') {
-                event.preventDefault();
+        // Custom Dropdown Logic
+        customDropdownButton.addEventListener('click', () => {
+            const isExpanded = customDropdownButton.getAttribute('aria-expanded') === 'true';
+            customDropdownButton.setAttribute('aria-expanded', !isExpanded);
+            dropdownOptions.classList.toggle('hidden', isExpanded);
+            dropdownArrow.classList.toggle('rotate-180', !isExpanded);
+        });
+
+        // Event listener for selecting an option in the custom dropdown
+        dropdownOptions.addEventListener('click', (event) => {
+            const selectedLi = event.target.closest('li');
+            if (selectedLi) {
+                const value = selectedLi.dataset.value;
+                const text = selectedLi.textContent;
+                selectedOptionText.textContent = text;
+                typeOfOrderHiddenInput.value = value; // Update the hidden input's value
+                customDropdownButton.setAttribute('aria-expanded', 'false');
+                dropdownOptions.classList.add('hidden');
+                dropdownArrow.classList.remove('rotate-180');
             }
         });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (event) => {
+            if (!customDropdownButton.contains(event.target) && !dropdownOptions.contains(event.target)) {
+                customDropdownButton.setAttribute('aria-expanded', 'false');
+                dropdownOptions.classList.add('hidden');
+                dropdownArrow.classList.remove('rotate-180');
+            }
+        });
+
+        // Form Submission Handler
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault(); // Prevent default form submission to handle it via JavaScript
+
+            // Final validation for step 2 before submission (Step 3 fields are optional)
+            if (!validateStep2()) {
+                showStep(2); // Go back to step 2 if invalid
+                return;
+            }
+            // Ensure meeting slot is confirmed available before final submission
+            if (!availabilityMessage.classList.contains('text-green-500')) {
+                formMessage.textContent = 'Please re-check meeting availability and ensure it is available before submitting.';
+                formMessage.classList.remove('text-green-300');
+                formMessage.classList.add('text-red-300');
+                showStep(1); // Go back to step 1 to re-check
+                return;
+            }
+
+            formMessage.textContent = ''; // Clear previous messages
+            formMessage.className = 'mt-4 text-center text-sm font-medium text-white'; // Reset classes
+
+            const formData = new FormData(form);
+            const data = {};
+            // Convert FormData to a plain object for JSON submission
+            formData.forEach((value, key) => {
+                data[key] = value;
+            });
+
+            // Store original 24-hour time for Firestore Timestamp, but send formatted for FormEasy
+            const originalMeetingTime24h = meetingTime.value; // Use the direct input value here
+
+            // Format meetingTime for both display and Google Sheet
+            if (originalMeetingTime24h) {
+                data.meetingTime = formatTimeForDisplay(originalMeetingTime24h);
+            }
+
+            // The value of typeOfOrder is now taken from the hidden input
+            data.typeOfOrder = typeOfOrderHiddenInput.value;
+
+            // Show a loading message during submission
+            formMessage.textContent = 'Submitting order request...';
+            formMessage.classList.add('text-yellow-300');
+
+            try {
+                // First, attempt to submit data to the FormEasy Apps Script endpoint
+                const response = await fetch(FORM_EASY_ENDPOINT, {
+                    method: 'POST',
+                    mode: 'no-cors', // 'no-cors' is often required for Google Apps Script deployments
+                    headers: {
+                        'Content-Type': 'text/plain;charset=utf-8', // FormEasy expects this content type
+                    },
+                    body: JSON.stringify(data), // Send data as a JSON string
+                });
+
+                // Since 'no-cors' mode is used, we cannot inspect the response directly.
+                // We assume success here and proceed to book the meeting in Firebase.
+                if (db && userId && appId) {
+                    const selectedDate = meetingDate.value;
+                    // Use original 24-hour time for creating the Date object for Firestore Timestamp
+                    const dateTimeForBooking = new Date(`${selectedDate}T${originalMeetingTime24h}:00`);
+
+                    const meetingsRef = collection(db, 'artifacts', appId, 'public', 'data', 'bookedMeetings');
+                    
+                    // Add the meeting booking to Firestore
+                    await addDoc(meetingsRef, {
+                        dateTime: Timestamp.fromDate(dateTimeForBooking), // Store meeting date/time as Firestore Timestamp
+                        bookedBy: userId, // Record the user who booked it
+                        clientEmail: data.emailAddress, // Store client email for reference
+                        clientName: data.fullName, // Store client name
+                        orderType: data.typeOfOrder, // Store order type from the form
+                        createdAt: Timestamp.now() // Record when the booking was created
+                    });
+                    console.log("Meeting successfully booked in Firestore:", dateTimeForBooking);
+                } else {
+                    console.warn("Firebase not initialized or userId/appId missing, meeting not booked in Firestore.");
+                }
+
+                // Populate submitted details on the success page
+                let detailsHtml = '';
+                // Mapping of form field names to more readable labels
+                const fieldLabels = {
+                    typeOfOrder: 'Type of Order',
+                    detailedDescription: 'Detailed Description',
+                    meetingDate: 'Meeting Date',
+                    meetingTime: 'Meeting Time', // This will now be the formatted time (AM/PM)
+                    fullName: 'Full Name',
+                    emailAddress: 'Email Address',
+                    phoneNumber: 'Phone Number',
+                    facebookProfile: 'Facebook Profile/Page URL',
+                    instagramHandle: 'Instagram Handle',
+                    twitterHandle: 'Twitter/X Handle'
+                };
+                for (const key in data) {
+                    if (data.hasOwnProperty(key) && data[key]) { // Only display fields that have a value
+                        const label = fieldLabels[key] || key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()); // Convert camelCase to readable
+                        detailsHtml += `<p class="mb-2"><span class="font-bold text-amber-200">${label}:</span> ${data[key]}</p>`;
+                    }
+                }
+                submittedDetailsDiv.innerHTML = detailsHtml;
+
+
+                // Hide the form container and show the success message container
+                formContainer.classList.add('hidden');
+                successMessageContainer.classList.remove('hidden');
+
+                // Clear form message as we are now on a new page
+                formMessage.textContent = ''; 
+                formMessage.classList.remove('text-yellow-300', 'text-red-300', 'text-green-300');
+
+                // Reset step indicators visually for potential next fill
+                stepIndicators.forEach(indicator => {
+                    indicator.classList.remove('bg-purple-400', 'text-white', 'bg-white', 'text-purple-700');
+                    indicator.classList.add('bg-gray-300', 'text-gray-700');
+                });
+                stepIndicators[0].classList.add('bg-white', 'text-purple-700'); // Set first indicator active for next fill
+
+            } catch (error) {
+                // Handle errors during form submission or Firebase booking
+                console.error('Error submitting form or booking meeting:', error);
+                formMessage.textContent = 'There was an error submitting your request. Please try again.';
+                formMessage.classList.remove('text-yellow-300', 'text-green-300');
+                formMessage.classList.add('text-red-300');
+            }
+        });
+
+        // Event listener for "Fill Another Request" button
+        fillAgainBtn.addEventListener('click', () => {
+            successMessageContainer.classList.add('hidden'); // Hide success message
+            formContainer.classList.remove('hidden'); // Show form container
+            form.reset(); // Reset the form fields
+            
+            // Reset custom dropdown state
+            selectedOptionText.textContent = 'Select Order Type';
+            typeOfOrderHiddenInput.value = ''; // Clear the hidden input's value
+            customDropdownButton.setAttribute('aria-expanded', 'false');
+            dropdownOptions.classList.add('hidden');
+            dropdownArrow.classList.remove('rotate-180');
+
+
+            showStep(1); // Go back to the first step
+            availabilityMessage.textContent = ''; // Clear availability message
+            availabilityMessage.classList.remove('text-green-500', 'text-red-500', 'text-yellow-500');
+        });
+
+
+        // Ensure Firebase is ready before allowing any interactions that depend on it.
+        // This is crucial because the Firebase SDK script loads asynchronously.
+        window.onload = async () => {
+            await checkFirebaseReady(); // Wait for Firebase to be fully initialized and globals available
+            console.log("All scripts loaded and Firebase ready for interactions.");
+        };
+
     </script>
 </body>
 </html>
