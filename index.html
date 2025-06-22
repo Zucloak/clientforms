@@ -270,30 +270,30 @@
 
         /**
          * Checks if Firebase is initialized and its global variables are available.
-         * Resolves when ready, or after a timeout if not.
+         * Resolves when ready, or rejects if it times out.
          * @returns {Promise<void>}
          */
         const checkFirebaseReady = () => {
-            return new Promise(resolve => {
+            return new Promise((resolve, reject) => {
+                let checkCount = 0;
+                const maxChecks = 50; // Try for 5 seconds (50 checks * 100ms)
                 const interval = setInterval(() => {
-                    // Check if all necessary Firebase globals are available on the window object
+                    // Check if window properties set by firebase-init.js are available
                     if (window.db && window.userId && window.appId) {
-                        db = window.db;
+                        db = window.db; // Assign to local module variables
                         userId = window.userId;
                         appId = window.appId;
-                        clearInterval(interval); // Stop checking once ready
+                        clearInterval(interval);
                         console.log("Firebase globals are ready in main script.");
                         resolve();
-                    }
-                }, 100); // Check every 100ms
-                // Add a timeout to prevent infinite loops if Firebase fails to load
-                setTimeout(() => {
-                    if (!window.db || !window.userId || !window.appId) {
+                    } else if (checkCount >= maxChecks) {
                         clearInterval(interval);
-                        console.error("Firebase globals not ready after timeout.");
-                        resolve(); // Resolve anyway to avoid blocking the app
+                        const errorMessage = `Firebase initialization timed out. Globals status: db=${!!window.db}, userId=${!!window.userId}, appId=${!!window.appId}`;
+                        console.error(errorMessage);
+                        reject(new Error(errorMessage)); // Reject the promise on timeout
                     }
-                }, 5000); // 5 seconds timeout
+                    checkCount++;
+                }, 100);
             });
         };
         
@@ -468,45 +468,36 @@
 
         // Firebase Meeting Availability Check
         checkAvailabilityBtn.addEventListener('click', async () => {
-            // Ensure Firebase is ready before attempting database operations
-            if (!db || !userId || !appId) {
-                availabilityMessage.textContent = 'Firebase not ready. Please wait...';
-                availabilityMessage.classList.remove('text-green-500', 'text-red-500');
-                availabilityMessage.classList.add('text-yellow-500');
-                await checkFirebaseReady(); // Wait for Firebase to be ready
+            try {
+                // Ensure Firebase is ready before attempting database operations
                 if (!db || !userId || !appId) {
-                    // If still not ready after waiting, show error
-                    availabilityMessage.textContent = 'Firebase connection failed. Try reloading.';
+                    availabilityMessage.textContent = 'Firebase connecting...'; // More specific message
+                    availabilityMessage.classList.remove('text-green-500', 'text-red-500');
+                    availabilityMessage.classList.add('text-yellow-500');
+                    await checkFirebaseReady(); // This will now reject on timeout
+                    // If checkFirebaseReady resolves, db, userId, appId are now guaranteed to be set
+                }
+
+                const date = meetingDate.value;
+                const time = meetingTime.value;
+
+                // Validate if date and time are selected
+                if (!date || !time) {
+                    availabilityMessage.textContent = 'Please select both date and time.';
                     availabilityMessage.classList.remove('text-green-500', 'text-yellow-500');
                     availabilityMessage.classList.add('text-red-500');
                     return;
                 }
-            }
 
-            const date = meetingDate.value;
-            const time = meetingTime.value;
+                // Combine date and time into a single Date object for Firestore comparison
+                const selectedDateTime = new Date(`${date}T${time}:00`);
 
-            // Validate if date and time are selected
-            if (!date || !time) {
-                availabilityMessage.textContent = 'Please select both date and time.';
-                availabilityMessage.classList.remove('text-green-500', 'text-yellow-500');
-                availabilityMessage.classList.add('text-red-500');
-                return;
-            }
+                availabilityMessage.textContent = 'Checking availability...';
+                availabilityMessage.classList.remove('text-green-500', 'text-red-500');
+                availabilityMessage.classList.add('text-yellow-500');
 
-            // Combine date and time into a single Date object for Firestore comparison
-            const selectedDateTime = new Date(`${date}T${time}:00`);
-
-            // Show checking message
-            availabilityMessage.textContent = 'Checking availability...';
-            availabilityMessage.classList.remove('text-green-500', 'text-red-500');
-            availabilityMessage.classList.add('text-yellow-500');
-
-            try {
-                // Query Firestore for existing meetings at the selected dateTime
-                // Path: /artifacts/{appId}/public/data/bookedMeetings
+                // Now db, userId, appId should definitely be available if checkFirebaseReady passed
                 const meetingsRef = collection(db, 'artifacts', appId, 'public', 'data', 'bookedMeetings');
-                // Use Timestamp for query as Firebase stores Date objects as Timestamps
                 const q = query(meetingsRef, where('dateTime', '==', Timestamp.fromDate(selectedDateTime)));
                 const querySnapshot = await getDocs(q);
 
@@ -522,9 +513,8 @@
                     availabilityMessage.classList.add('text-red-500');
                 }
             } catch (error) {
-                // Handle errors during availability check
                 console.error("Error checking meeting availability:", error);
-                availabilityMessage.textContent = 'Error checking availability. Try again later.';
+                availabilityMessage.textContent = `Error checking availability: ${error.message}. Try again later.`; // Show error message
                 availabilityMessage.classList.remove('text-green-500', 'text-yellow-500');
                 availabilityMessage.classList.add('text-red-500');
             }
