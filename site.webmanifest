@@ -1,6 +1,6 @@
 {
-  "name": "SYNAPPSE",
-  "short_name": "SYNAPPSE",
+  "name": "SYNAPPSE Request Form",
+  "short_name": "Request Form",
   "icons": [
     {
       "src": "/android-chrome-192x192.png",
