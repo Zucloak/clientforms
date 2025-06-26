@@ -33,10 +33,12 @@ body {
     min-height: 100vh; /* Ensure body takes full viewport height */
 }
 
-/* Ensure form steps are hidden by default */
-.form-step {
-    display: none;
-}
+/* Removed: .form-step { display: none; }
+   The visibility of form steps is now solely managed by adding/removing the 'hidden'
+   Tailwind class via JavaScript, which inherently sets display: none !important;.
+   Step 0 should start visible because it does not have 'hidden' class in index.html,
+   and script.js's showStep(0) ensures its display.
+*/
 
 /* Custom styles for input, textarea, and select focus states */
 input:focus, textarea:focus, select:focus {
