@@ -32,6 +32,12 @@ body {
     overflow-x: hidden; /* Prevent horizontal scrollbars due to animations */
     min-height: 100vh; /* Ensure body takes full viewport height */
 }
+
+/* Ensure form steps are hidden by default */
+.form-step {
+    display: none;
+}
+
 /* Custom styles for input, textarea, and select focus states */
 input:focus, textarea:focus, select:focus {
     outline: none; /* Remove default outline */
