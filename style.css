@@ -121,3 +121,74 @@ input:focus, textarea:focus, select:focus {
         text-align: center; /* Center text and input fields */
     }
 }
+
+/* Styles for the modal */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 100; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgba(0,0,0,0.8); /* Black w/ opacity */
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background-color: #4a0d80; /* Darker purple to match theme */
+    margin: auto;
+    padding: 2.5rem; /* Increased padding */
+    border-radius: 1rem; /* More rounded corners */
+    width: 90%; /* Responsive width */
+    max-width: 700px; /* Max width for larger screens */
+    box-shadow: 0 5px 15px rgba(0,0,0,0.5); /* Stronger shadow */
+    position: relative;
+    max-height: 80vh; /* Limit height to enable scrolling for long content */
+    overflow-y: auto; /* Enable scrolling within the modal content */
+    color: #ffffff; /* White text for contrast */
+}
+
+.close-button {
+    color: #aaa;
+    position: absolute;
+    top: 1rem;
+    right: 1.5rem;
+    font-size: 2rem; /* Larger close button */
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.2s ease-in-out;
+}
+
+.close-button:hover,
+.close-button:focus {
+    color: #fff; /* White on hover */
+    text-decoration: none;
+}
+
+/* Added for scrollable terms section */
+.scrollable-terms {
+    max-height: 20rem; /* Adjust as needed, e.g., max-h-80 for more height */
+    overflow-y: auto;
+    padding-right: 0.5rem; /* Add some padding to avoid scrollbar overlapping text */
+    scrollbar-width: thin; /* For Firefox */
+    scrollbar-color: #ffd700 #4a0d80; /* thumb and track color for Firefox */
+}
+
+/* For Webkit browsers (Chrome, Safari) */
+.scrollable-terms::-webkit-scrollbar {
+    width: 8px; /* Width of the scrollbar */
+}
+
+.scrollable-terms::-webkit-scrollbar-track {
+    background: #4a0d80; /* Track color */
+    border-radius: 10px;
+}
+
+.scrollable-terms::-webkit-scrollbar-thumb {
+    background-color: #ffd700; /* Thumb color */
+    border-radius: 10px;
+    border: 2px solid #4a0d80; /* Border around the thumb */
+}
