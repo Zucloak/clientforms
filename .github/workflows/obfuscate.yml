@@ -52,4 +52,4 @@ jobs:
           git config --global user.email 'github-actions@github.com'
           git add dist/
           git commit -m "Auto-obfuscated JS and CSS files [skip ci]" || echo "No changes to commit"
-          git push https://x-access-token:${GH_PAT}@github.com/${GITHUB_REPOSITORY}.git HEAD:${GITHUB_REF#refs/heads/}
+          git push https://x-access-token:${CL_BT}@github.com/${GITHUB_REPOSITORY}.git HEAD:${GITHUB_REF#refs/heads/}
