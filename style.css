@@ -1,0 +1,123 @@
+/* style.css */
+
+/* Keyframe animation for new background gradient movement, now rotating through corners */
+@keyframes movingGradient {
+    0% { background-position: 0% 0%; }    /* Top-left */
+    25% { background-position: 100% 0%; }   /* Top-right */
+    50% { background-position: 100% 100%; } /* Bottom-right */
+    75% { background-position: 0% 100%; }   /* Bottom-left */
+    100% { background-position: 0% 0%; }   /* Back to Top-left for seamless loop */
+}
+
+/* Keyframe for success checkmark animation */
+@keyframes drawCheck {
+    0% {
+        stroke-dashoffset: 1000;
+        opacity: 0;
+    }
+    100% {
+        stroke-dashoffset: 0;
+        opacity: 1;
+    }
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    /* Adjusted radial-gradient for even more subtle lighter movement and balanced darker shade */
+    /* Removed 'circle at 50% 50%' to make the 'light' appear only with background-position animation */
+    background: radial-gradient(rgba(255, 255, 255, 0.000001), #5A0DA0, #3A0070);
+    background-size: 400% 400%; /* Larger background to allow for animation and smaller light appearance */
+    animation: movingGradient 16s ease infinite; /* Apply the new moving gradient animation */
+    color: #ffffff; /* White text for contrast */
+    overflow-x: hidden; /* Prevent horizontal scrollbars due to animations */
+    min-height: 100vh; /* Ensure body takes full viewport height */
+}
+/* Custom styles for input, textarea, and select focus states */
+input:focus, textarea:focus, select:focus {
+    outline: none; /* Remove default outline */
+    border-color: #fca311; /* Amber for focus border */
+    box-shadow: 0 0 0 3px rgba(252, 163, 17, 0.5); /* Shadow with amber tint */
+}
+/* Style for all form fields (input, textarea, select) */
+.form-field {
+    background-color: rgba(255, 255, 255, 0.1); /* Slightly transparent white for fields */
+    border: 1px solid rgba(255, 255, 255, 0.3); /* Lighter border */
+    color: #ffffff; /* White text within fields */
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    transition: all 0.2s ease-in-out; /* Smooth transition for hover/focus */
+}
+.form-field::placeholder {
+    color: rgba(255, 255, 255, 0.7); /* Lighter placeholder text */
+}
+.form-field:hover {
+    background-color: rgba(255, 255, 255, 0.15); /* Slightly less transparent on hover */
+}
+.form-field:focus {
+    background-color: rgba(255, 255, 255, 0.2); /* Even less transparent on focus */
+}
+/* Specific style for custom select dropdown options */
+.custom-dropdown-options {
+    background-color: #6a0dad; /* Darker background for options */
+}
+.custom-dropdown-options li:hover {
+    background-color: #8a2be2; /* Slightly lighter purple on hover */
+}
+
+/* Styling for primary button */
+.btn-primary {
+    background-color: #ffd700; /* gold */
+    color: #212529; /* Dark text for contrast */
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    transition: all 0.2s ease-in-out;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+.btn-primary:hover {
+    background-color: #e69500; /* Darker amber on hover */
+    transform: translateY(-2px); /* Slight lift effect */
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+}
+/* Styling for secondary button */
+.btn-secondary {
+    background-color: rgba(255, 255, 255, 0.2); /* Transparent white */
+    color: #ffffff;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    transition: all 0.2s ease-in-out;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+.btn-secondary:hover {
+    background-color: rgba(255, 255, 255, 0.3); /* Slightly less transparent on hover */
+    transform: translateY(-2px); /* Slight lift effect */
+}
+
+/* Custom CSS for mobile responsiveness */
+/* Make the main form container take more width on small screens */
+.form-container-responsive {
+    padding-left: 1rem; /* px-4 */
+    padding-right: 1rem; /* px-4 */
+    max-width: 100%; /* Default to full width */
+}
+@media (min-width: 640px) { /* sm breakpoint and up */
+    .form-container-responsive {
+        padding-left: 2.5rem; /* sm:px-10 */
+        padding-right: 2.5rem; /* sm:px-10 */
+        max-width: 48rem; /* sm:max-w-4xl */
+    }
+}
+
+/* Remove explicit max-width from inputs, let them fill their parent's space */
+@media (max-width: 639px) { /* Targets screens smaller than sm breakpoint */
+    .date-time-input-group {
+        /* Removed specific max-width from input[type="date"], input[type="time"] */
+        /* The w-full on input will now respect the new parent container width */
+        width: 100%; /* Ensure the flex item takes full width */
+    }
+    .date-time-input-group label,
+    .date-time-input-group input {
+        text-align: center; /* Center text and input fields */
+    }
+}
