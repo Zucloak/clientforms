@@ -2,7 +2,6 @@
 // This is a Vercel Serverless Function that serves your Firebase configuration
 // from environment variables to the client-side.
 // It ensures your Firebase config values are not hardcoded in the client bundle
-// and can be easily managed via Vercel's environment settings.
 
 export default function handler(request, response) {
   // Set the Content-Type header to 'application/javascript'
