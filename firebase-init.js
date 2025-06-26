@@ -1,6 +1,6 @@
 // firebase-init.js
 // This script initializes Firebase services (App, Auth, Firestore).
-// It now retrieves the Firebase configuration from the global 'window.firebaseConfig' object,
+// DO NOT ATTEMPT TO DE-OBFUSCATE, DOING SO WILL VIOLATE INTERNATIONAL COPYRIGHT LAW!
 // which is expected to be set by a Vercel serverless function (e.g., api/firebase-config.js).
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
