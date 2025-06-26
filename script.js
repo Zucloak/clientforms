@@ -3,18 +3,20 @@
 // It interacts with Firebase (initialized by firebase-init.js) for meeting availability
 // and form submission, and handles UI updates and form validation.
 
-// Import necessary Firebase modules for this script block
-import { collection, query, where, getDocs, addDoc, Timestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+// Import necessary Firestore modules for direct use in this script.
+// db, userId, appId, and Timestamp will be retrieved from the window object.
+import { collection, query, where, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-// Declare global Firebase variables to be populated from the initial script block (firebase-init.js)
-// These are expected to be available on the window object after firebase-init.js runs.
+// Declare variables to hold Firebase objects.
+// These will be populated from the window object once firebase-init.js has run.
 let db;
 let userId;
 let appId;
-// Timestamp is already imported above, so no need to redeclare here.
+let Timestamp; // Declare Timestamp as a local variable to be assigned from window
+
 
 /**
- * Checks if Firebase is initialized and its global variables are available.
+ * Checks if Firebase is initialized and its global variables are available on the window object.
  * Resolves when ready, or rejects if it times out.
  * @returns {Promise<void>}
  */
@@ -24,10 +26,11 @@ const checkFirebaseReady = () => {
         const maxChecks = 50; // Try for 5 seconds (50 checks * 100ms)
         const interval = setInterval(() => {
             // Check if window properties set by firebase-init.js are available
-            if (window.db && window.userId && window.appId && typeof window.updateFirebaseStatusUI === 'function') {
+            if (window.db && window.userId && window.appId && window.Timestamp && typeof window.updateFirebaseStatusUI === 'function') {
                 db = window.db; // Assign to local module variables
                 userId = window.userId;
                 appId = window.appId;
+                Timestamp = window.Timestamp; // Assign Timestamp from window
                 clearInterval(interval);
                 console.log("script.js: Firebase globals are ready in main script.");
                 // Use the exposed status update function from firebase-init.js
@@ -35,7 +38,7 @@ const checkFirebaseReady = () => {
                 resolve();
             } else if (checkCount >= maxChecks) {
                 clearInterval(interval);
-                const errorMessage = `Firebase initialization timed out in script.js. Globals status: db=${!!window.db}, userId=${!!window.userId}, appId=${!!window.appId}, updateStatusUI=${typeof window.updateFirebaseStatusUI}`;
+                const errorMessage = `Firebase initialization timed out in script.js. Globals status: db=${!!window.db}, userId=${!!window.userId}, appId=${!!window.appId}, Timestamp=${!!window.Timestamp}, updateStatusUI=${typeof window.updateFirebaseStatusUI}`;
                 console.error("script.js:", errorMessage);
                 // Use the exposed status update function if available, otherwise log.
                 if (typeof window.updateFirebaseStatusUI === 'function') {
@@ -58,18 +61,21 @@ const form = document.getElementById('orderForm');
 const formMessage = document.getElementById('formMessage');
 
 // Get form step elements and step indicator elements
+const step0 = document.getElementById('step0'); // New step 0
 const step1 = document.getElementById('step1');
 const step2 = document.getElementById('step2');
 const step3 = document.getElementById('step3');
 const stepIndicators = [
+    document.getElementById('step-indicator-0'), // New indicator for step 0
     document.getElementById('step-indicator-1'),
     document.getElementById('step-indicator-2'),
     document.getElementById('step-indicator-3')
 ];
 
-let currentStep = 1; // Track the current active step
+let currentStep = 0; // Track the current active step, starting from 0
 
 // Form Elements for Validation - references to input fields
+const agreeToTermsCheckbox = document.getElementById('agreeToTerms'); // New checkbox for step 0
 const detailedDescription = document.getElementById('detailedDescription');
 const meetingDate = document.getElementById('meetingDate');
 const meetingTime = document.getElementById('meetingTime');
@@ -86,17 +92,17 @@ const checkAvailabilityBtn = document.getElementById('checkAvailabilityBtn');
 const availabilityMessage = document.getElementById('availabilityMessage');
 const fillAgainBtn = document.getElementById('fillAgainBtn'); // New button
 
-// Custom Dropdown Elements
+// Custom Dropdown Logic
 const customDropdownButton = document.getElementById('customDropdownButton');
 const selectedOptionText = document.getElementById('selectedOptionText');
 const dropdownOptions = document.getElementById('dropdownOptions');
 const dropdownArrow = document.getElementById('dropdownArrow');
-const typeOfOrderHiddenInput = document.getElementById('typeOfOrder'); // Hidden input for value
+const typeOfOrderHiddenInput = document.getElementById('typeOfOrder');
 
 
 // IMPORTANT: Replace with your deployed FormEasy Apps Script Web App URL
 // This endpoint is used to submit form data to a Google Sheet via Google Apps Script.
-const FORM_EASY_ENDPOINT = 'https://script.google.com/macros/s/AKfycbwk493phL80NU5ErryswrRgOmrN6fyzpUsSOGyhdXOhrEzPHtnxWq2feJOYa_a6SJG0/exec'; 
+const FORM_EASY_ENDPOINT = 'https://script.google.com/macros/s/AKfycbwk493phL80NU5ErryswrRgOmrN6fyzpUsSOGyhdXOhrEzPHtnxWq2feJOYa_a6SJG0/exec';
 
 /**
  * Safely sanitizes input by escaping HTML characters and removing null bytes.
@@ -122,11 +128,11 @@ function sanitizeInput(value) {
  */
 function updateStepIndicators() {
     stepIndicators.forEach((indicator, index) => {
-        if (index + 1 === currentStep) {
+        if (index === currentStep) {
             // Current step: white background, purple text
             indicator.classList.add('bg-white', 'text-purple-700');
             indicator.classList.remove('bg-gray-300', 'text-gray-700', 'bg-purple-400', 'text-white');
-        } else if (index + 1 < currentStep) {
+        } else if (index < currentStep) {
             // Completed step: purple background, white text
             indicator.classList.add('bg-purple-400', 'text-white');
             indicator.classList.remove('bg-white', 'text-purple-700', 'bg-gray-300', 'text-gray-700');
@@ -140,16 +146,18 @@ function updateStepIndicators() {
 
 /**
  * Shows a specific form step and hides others.
- * @param {number} stepNum - The step number to show (1, 2, or 3).
+ * @param {number} stepNum - The step number to show (0, 1, 2, or 3).
  */
 function showStep(stepNum) {
     // Hide all steps first
+    step0.classList.add('hidden'); // Hide new step 0
     step1.classList.add('hidden');
     step2.classList.add('hidden');
     step3.classList.add('hidden');
-    
+
     // Show the requested step
     switch(stepNum) {
+        case 0: step0.classList.remove('hidden'); break;
         case 1: step1.classList.remove('hidden'); break;
         case 2: step2.classList.remove('hidden'); break;
         case 3: step3.classList.remove('hidden'); break;
@@ -158,8 +166,23 @@ function showStep(stepNum) {
     updateStepIndicators(); // Update visual indicators
 }
 
-// Initial display when the page loads (handled by window.onload for full readiness)
-// showStep(1); // This will now be called after Firebase is ready
+/**
+ * Validates fields in Step 0.
+ * @returns {boolean} True if terms are agreed, false otherwise.
+ */
+function validateStep0() {
+    formMessage.textContent = ''; // Clear any previous messages
+    formMessage.classList.remove('text-red-300', 'text-green-300', 'text-yellow-300');
+
+    if (!agreeToTermsCheckbox.checked) {
+        formMessage.textContent = 'You must agree to the Data Privacy Act Law and Terms of Service to proceed.';
+        formMessage.classList.add('text-red-300');
+        // Scroll to the top of the form message to make it visible
+        formMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return false;
+    }
+    return true;
+}
 
 /**
  * Validates fields in Step 1.
@@ -171,7 +194,7 @@ function validateStep1() {
     formMessage.classList.remove('text-red-300', 'text-green-300', 'text-yellow-300');
 
     // Check HTML5 validation for required fields in Step 1
-    const requiredFields1 = [detailedDescription, meetingDate, meetingTime]; 
+    const requiredFields1 = [detailedDescription, meetingDate, meetingTime];
     for (const field of requiredFields1) {
         if (!field.checkValidity()) {
             field.reportValidity(); // Show native browser error
@@ -211,7 +234,7 @@ function validateStep2() {
     for (const field of requiredFields2) {
         if (!field.checkValidity()) {
             field.reportValidity(); // Show native browser error
-            formMessage.textContent = `Please fill out the "${field.previousElementSibling.textContent.trim()}" field.` || `Please fill out the field above.`;
+            formMessage.textContent = `Please fill out the "${field.previousElementSibling.textContent.trim()}" field.`;
             formMessage.classList.add('text-red-300');
             return false;
         }
@@ -220,6 +243,16 @@ function validateStep2() {
 }
 
 // Event Listeners for Navigation Buttons
+document.getElementById('next0').addEventListener('click', () => {
+    if (validateStep0()) {
+        showStep(1); // Move to Step 1 if Step 0 is valid
+    }
+});
+
+document.getElementById('prev1').addEventListener('click', () => {
+    showStep(0); // Go back to Step 0
+});
+
 document.getElementById('next1').addEventListener('click', () => {
     if (validateStep1()) {
         showStep(2); // Move to Step 2 if Step 1 is valid
@@ -244,8 +277,8 @@ document.getElementById('prev3').addEventListener('click', () => {
 checkAvailabilityBtn.addEventListener('click', async () => {
     try {
         // Ensure Firebase is ready before attempting database operations
-        await checkFirebaseReady(); 
-        
+        await checkFirebaseReady();
+
         const date = meetingDate.value;
         const time = meetingTime.value;
 
@@ -264,7 +297,7 @@ checkAvailabilityBtn.addEventListener('click', async () => {
         availabilityMessage.classList.remove('text-green-500', 'text-red-500');
         availabilityMessage.classList.add('text-yellow-500');
 
-        // db, userId, appId are now guaranteed to be available if checkFirebaseReady resolved
+        // db, userId, appId, Timestamp are now globally available from window
         const meetingsRef = collection(db, 'artifacts', appId, 'public', 'data', 'bookedMeetings');
         const q = query(meetingsRef, where('dateTime', '==', Timestamp.fromDate(selectedDateTime)));
         const querySnapshot = await getDocs(q);
@@ -282,8 +315,7 @@ checkAvailabilityBtn.addEventListener('click', async () => {
         }
     } catch (error) {
         console.error("Error checking meeting availability:", error);
-        // Display the specific error message from the rejection
-        availabilityMessage.textContent = `Error checking availability: ${error.message}. Please check console for details.`; 
+        availabilityMessage.textContent = `Error checking availability: ${error.message}. Please check console for details.`;
         availabilityMessage.classList.remove('text-green-500', 'text-yellow-500');
         availabilityMessage.classList.add('text-red-500');
     }
@@ -355,11 +387,11 @@ form.addEventListener('submit', async (event) => {
     data.typeOfOrder = sanitizeInput(typeOfOrderHiddenInput.value);
     data.detailedDescription = sanitizeInput(detailedDescription.value);
     data.meetingDate = sanitizeInput(meetingDate.value); // Dates are generally safer, but sanitizing doesn't hurt.
-    
+
     // Store original 24-hour time for Firestore Timestamp, but send formatted for FormEasy
-    const originalMeetingTime24h = meetingTime.value; 
+    const originalMeetingTime24h = meetingTime.value;
     data.meetingTime = sanitizeInput(formatTimeForDisplay(originalMeetingTime24h)); // Sanitize formatted time
-    
+
     data.fullName = sanitizeInput(fullName.value);
     data.emailAddress = sanitizeInput(emailAddress.value); // Emails should be validated with regex, but sanitizing still applies
     data.phoneNumber = sanitizeInput(phoneNumber.value); // Phone numbers should be validated for format, sanitizing applied
@@ -390,7 +422,7 @@ form.addEventListener('submit', async (event) => {
             const dateTimeForBooking = new Date(`${selectedDate}T${originalMeetingTime24h}:00`);
 
             const meetingsRef = collection(db, 'artifacts', appId, 'public', 'data', 'bookedMeetings');
-            
+
             // Add the meeting booking to Firestore
             await addDoc(meetingsRef, {
                 dateTime: Timestamp.fromDate(dateTimeForBooking), // Store meeting date/time as Firestore Timestamp
@@ -434,7 +466,7 @@ form.addEventListener('submit', async (event) => {
         successMessageContainer.classList.remove('hidden');
 
         // Clear form message as we are now on a new page
-        formMessage.textContent = ''; 
+        formMessage.textContent = '';
         formMessage.classList.remove('text-yellow-300', 'text-red-300', 'text-green-300');
 
         // Reset step indicators visually for potential next fill
@@ -458,7 +490,7 @@ fillAgainBtn.addEventListener('click', () => {
     successMessageContainer.classList.add('hidden'); // Hide success message
     formContainer.classList.remove('hidden'); // Show form container
     form.reset(); // Reset the form fields
-    
+
     // Reset custom dropdown state
     selectedOptionText.textContent = 'Select Order Type';
     typeOfOrderHiddenInput.value = ''; // Clear the hidden input's value
@@ -467,7 +499,7 @@ fillAgainBtn.addEventListener('click', () => {
     dropdownArrow.classList.remove('rotate-180');
 
 
-    showStep(1); // Go back to the first step
+    showStep(0); // Go back to the first step (Step 0)
     availabilityMessage.textContent = ''; // Clear availability message
     availabilityMessage.classList.remove('text-green-500', 'text-red-500', 'text-yellow-500');
 });
@@ -476,24 +508,16 @@ fillAgainBtn.addEventListener('click', () => {
 // Ensure Firebase is ready before allowing any interactions that depend on it.
 // This is crucial because the Firebase SDK script loads asynchronously.
 window.onload = async () => {
-    // Initial status update when HTML loads, but before Firebase is fully ready
-    // This initial call is managed by firebase-init.js for Firebase-specific status.
-    // However, for general "connecting to forms" status from script.js perspective:
-    const firebaseStatusElement = document.getElementById('firebaseStatus');
-    if (firebaseStatusElement && typeof window.updateFirebaseStatusUI === 'function') {
-        window.updateFirebaseStatusUI("Connecting to Forms...", "connecting");
-    } else {
-        console.warn("script.js: Could not set initial 'Connecting to Forms...' status as updateFirebaseStatusUI is not available yet.");
-    }
-    
+    // Show the first step (Step 0) immediately upon page load.
+    // This ensures the form content is visible while Firebase connects in the background.
+    showStep(0); 
+
     try {
-        await checkFirebaseReady(); // Wait for Firebase to be fully initialized and globals available
+        // checkFirebaseReady() will resolve once auth is complete and userId is available
+        await checkFirebaseReady();
         console.log("script.js: All scripts loaded and Firebase ready for interactions.");
-        // Once Firebase is ready, show the first step of the form
-        showStep(1); 
     } catch (error) {
         console.error("script.js: Firebase readiness check failed on onload:", error);
-        // updateFirebaseStatusUI is already called inside checkFirebaseReady for rejection.
     }
 };
 
