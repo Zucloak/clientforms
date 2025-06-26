@@ -22,9 +22,7 @@
     <!-- Google Fonts - Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- Firebase SDK Initialization (Moved to external file) -->
-    <!-- You MUST create a file named firebase-init.js in the same directory -->
-    <!-- This file will contain the actual Firebase initialization code and config -->
+    <!-- Firebase SDK Initialization (This file will set window.db, window.userId etc.) -->
     <script type="module" src="./firebase-init.js"></script>
 
     <style>
@@ -297,7 +295,7 @@
                     <h5 class="text-lg font-semibold text-white mb-2">6. Disclaimers and Limitation of Liability</h5>
                     <p class="text-sm text-gray-200 mb-2"><strong>No Warranties:</strong> The Services are provided "as is" and "as available" without any warranties of any kind, either express or implied, including, but not limited to, implied warranties of merchantability, fitness for a particular purpose, or non-infringement.</p>
                     <p class="text-sm text-gray-200 mb-2"><strong>Service Performance:</strong> While we strive for excellence, SYNAPPSE does not guarantee that the Services will be uninterrupted, error-free, or secure.</p>
-                    <p class="text-sm text-gray-200 mb-4"><strong>Limitation of Liability:</strong> In no event shall SYNAPPSE, its owners, employees, or partners be liable for any indirect, incidental, special, consequential, or punitive damages, including without limitation, loss of profits, data, use, goodwill, or other intangible losses, resulting from (i) your access to or use of or inability to access or use the Services; (ii) any conduct or content of any third party on the Services; (iii) any content obtained from the Services; or (iv) unauthorized access, use, or alteration of your transmissions or content, whether based on warranty, contract, tort (including negligence), or any other legal theory, whether or not we have been informed of the possibility of such damage.</p>
+                    <p class="text-sm text-gray-200 mb-4"><strong>Limitation of Liability:</strong> In no event shall SYNAPPSE, its owners, employees, or partners be liable for any indirect, incidental, special, consequential, or punitive damages, including without limitation, loss of profits, data, use, goodwill, or other intangible losses, resulting from (i) your access to or use of or inability to access or use the Services; (iii) any content obtained from the Services; or (iv) unauthorized access, use, or alteration of your transmissions or content, whether based on warranty, contract, tort (including negligence), or any other legal theory, whether or not we have been informed of the possibility of such damage.</p>
                     <p class="text-sm text-gray-200 mb-4">In no event shall SYNAPPSE's total liability to you for all damages, losses, and causes of action exceed the amount paid by you, if any, for accessing or using our Services within the six (6) months immediately preceding the date of the claim.</p>
                     <p class="text-sm text-gray-200 mb-4"><strong>Specific for On-Site Computer Servicing:</strong> While our partners exercise due diligence, SYNAPPSE is not responsible for any data loss, hardware damage, or other unforeseen issues that may occur during the troubleshooting, repair, or maintenance of computer systems. Clients are strongly advised to back up all critical data before any on-site service commences.</p>
 
@@ -474,10 +472,16 @@
 
 
     <script type="module">
-        // Import necessary Firebase modules for this script block
-        import { collection, query, where, getDocs, addDoc, Timestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        // Import Firebase variables from the external firebase-init.js file
-        import { db, userId, appId } from './firebase-init.js';
+        // Import necessary Firestore modules for direct use in this script.
+        // db, userId, appId, and Timestamp will be retrieved from the window object.
+        import { collection, query, where, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Declare variables to hold Firebase objects.
+        // These will be populated from the window object once firebase-init.js has run.
+        let db;
+        let userId;
+        let appId;
+        let Timestamp; // Declare Timestamp as a local variable to be assigned from window
 
 
         /**
@@ -508,7 +512,7 @@
 
 
         /**
-         * Checks if Firebase is initialized and its global variables are available.
+         * Checks if Firebase is initialized and its global variables are available on the window object.
          * Resolves when ready, or rejects if it times out.
          * @returns {Promise<void>}
          */
@@ -517,15 +521,19 @@
                 let checkCount = 0;
                 const maxChecks = 50; // Try for 5 seconds (50 checks * 100ms)
                 const interval = setInterval(() => {
-                    // Check if db and userId are available (imported from firebase-init.js)
-                    if (db && userId) {
+                    // Check if window properties set by firebase-init.js are available
+                    if (window.db && window.userId && window.appId && window.Timestamp) {
+                        db = window.db; // Assign to local module variables
+                        userId = window.userId;
+                        appId = window.appId;
+                        Timestamp = window.Timestamp; // Assign Timestamp from window
                         clearInterval(interval);
-                        console.log("Firebase globals are ready in main script.");
+                        console.log("main.js: Firebase globals are ready in main script.");
                         updateFirebaseStatusUI("Forms are updated in real time.", "success");
                         resolve();
                     } else if (checkCount >= maxChecks) {
                         clearInterval(interval);
-                        const errorMessage = `Firebase initialization timed out. Globals status: db=${!!db}, userId=${!!userId}, appId=${!!appId}`;
+                        const errorMessage = `Firebase initialization timed out. Globals status: db=${!!window.db}, userId=${!!window.userId}, appId=${!!window.appId}, Timestamp=${!!window.Timestamp}`;
                         console.error("main.js:", errorMessage);
                         updateFirebaseStatusUI("Forms are offline: Initialization error.", "error"); // Specific error
                         reject(new Error(errorMessage)); // Reject the promise on timeout
@@ -666,6 +674,8 @@
             if (!agreeToTermsCheckbox.checked) {
                 formMessage.textContent = 'You must agree to the Data Privacy Act Law and Terms of Service to proceed.';
                 formMessage.classList.add('text-red-300');
+                // Scroll to the top of the form message to make it visible
+                formMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 return false;
             }
             return true;
@@ -764,7 +774,6 @@
         checkAvailabilityBtn.addEventListener('click', async () => {
             try {
                 // Ensure Firebase is ready before attempting database operations
-                // checkFirebaseReady will now reject on timeout or auth failure, handled by catch block.
                 await checkFirebaseReady();
 
                 const date = meetingDate.value;
@@ -785,7 +794,7 @@
                 availabilityMessage.classList.remove('text-green-500', 'text-red-500');
                 availabilityMessage.classList.add('text-yellow-500');
 
-                // db, userId, appId are now guaranteed to be available if checkFirebaseReady resolved
+                // db, userId, appId, Timestamp are now globally available from window
                 const meetingsRef = collection(db, 'artifacts', appId, 'public', 'data', 'bookedMeetings');
                 const q = query(meetingsRef, where('dateTime', '==', Timestamp.fromDate(selectedDateTime)));
                 const querySnapshot = await getDocs(q);
@@ -803,7 +812,6 @@
                 }
             } catch (error) {
                 console.error("Error checking meeting availability:", error);
-                // Display the specific error message from the rejection
                 availabilityMessage.textContent = `Error checking availability: ${error.message}. Please check console for details.`;
                 availabilityMessage.classList.remove('text-green-500', 'text-yellow-500');
                 availabilityMessage.classList.add('text-red-500');
@@ -997,7 +1005,6 @@
         // Ensure Firebase is ready before allowing any interactions that depend on it.
         // This is crucial because the Firebase SDK script loads asynchronously.
         window.onload = async () => {
-            // updateFirebaseStatusUI("Connecting to Forms...", "connecting"); // Moved to script start
             try {
                 // checkFirebaseReady() will resolve once auth is complete and userId is available
                 await checkFirebaseReady();
