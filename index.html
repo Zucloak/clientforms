@@ -144,7 +144,7 @@
                             <span id="selectedOptionText">Select Order Type</span>
                             <svg class="w-5 h-5 text-white transform transition-transform duration-200" id="dropdownArrow" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                         </div>
-                        <input type="hidden" id="typeOfOrder" name="typeOfOrder" required value="">
+                        <input type="hidden" id="typeOfOrder" name="typeOfOrder" required value="" aria-hidden="true" tabindex="-1">
                     </label>
 
                     <ul id="dropdownOptions" class="absolute z-10 w-full mt-1 rounded-md shadow-lg overflow-hidden hidden custom-dropdown-options" role="listbox" aria-labelledby="typeOfOrderLabel">
