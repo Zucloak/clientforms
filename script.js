@@ -387,4 +387,45 @@ document.addEventListener("DOMContentLoaded", () => {
             console.error("script.js: Firebase readiness check failed on onload:", error);
         }
     };
+// --- Copy Protection Code ---
+// Disable right-click (context menu)
+document.addEventListener('contextmenu', e => e.preventDefault());
+
+// Disable specific keyboard shortcuts for saving, inspecting, copying, printing, etc.
+document.addEventListener('keydown', e => {
+    const isCtrlOrCmd = e.ctrlKey || e.metaKey; // Checks for Ctrl on Windows/Linux, Cmd on Mac
+    const isShift = e.shiftKey;
+
+    if (
+        // Developer Tools / Inspect Element
+        e.key === 'F12' ||
+        (isCtrlOrCmd && isShift && (e.key === 'I' || e.key === 'i')) || // Ctrl/Cmd + Shift + I
+        (isCtrlOrCmd && isShift && (e.key === 'J' || e.key === 'j')) || // Ctrl/Cmd + Shift + J (Chrome/Edge Dev Tools)
+        (isCtrlOrCmd && isShift && (e.key === 'C' || e.key === 'c')) || // Ctrl/Cmd + Shift + C (Inspect Element)
+
+        // View Page Source
+        (isCtrlOrCmd && (e.key === 'U' || e.key === 'u')) ||
+
+        // Save Page As
+        (isCtrlOrCmd && (e.key === 'S' || e.key === 's')) ||
+
+        // Print
+        (isCtrlOrCmd && (e.key === 'P' || e.key === 'p')) ||
+
+        // Open file
+        (isCtrlOrCmd && (e.key === 'O' || e.key === 'o')) ||
+
+        // New window
+        (isCtrlOrCmd && (e.key === 'N' || e.key === 'n')) ||
+
+        // Copy (redundant but harmless layer)
+        (isCtrlOrCmd && (e.key === 'C' || e.key === 'c')) ||
+
+        // Select All
+        (isCtrlOrCmd && (e.key === 'A' || e.key === 'a'))
+    ) {
+        e.preventDefault();
+        // Optionally, for extremely stubborn cases, stop propagation immediately:
+        // e.stopImmediatePropagation();
+    }
 });
