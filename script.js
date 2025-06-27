@@ -100,7 +100,7 @@ const detailedDescription = document.getElementById('detailedDescription');
 
 // New Duration Option elements
 const fixedDurationRadio = document.querySelector('input[name="meetingDurationOption"][value="fixed"]');
-const customDurationRadio = document.querySelector('input[name="meetingDurationOption"][value="custom']');
+const customDurationRadio = document.querySelector('input[name="meetingDurationOption"][value="custom"]');
 const meetingEndTimeGroup = document.getElementById('meetingEndTimeGroup'); // Div that holds the end time input
 
 const meetingDate = document.getElementById('meetingDate');
@@ -385,10 +385,8 @@ checkAvailabilityBtn.addEventListener('click', async () => {
         const endOfDay = new Date(date);
         endOfDay.setHours(23, 59, 59, 999);
 
-        // --- IMPORTANT CHANGE HERE ---
         // Changed collection from 'bookedMeetings' to 'bookingDateTimes' for read access
         const meetingsRef = collection(db, 'artifacts', appId, 'public', 'data', 'bookingDateTimes');
-        // --- END IMPORTANT CHANGE ---
 
         const q = query(meetingsRef, 
             where('startTime', '>=', Timestamp.fromDate(startOfDay)),
@@ -528,8 +526,8 @@ form.addEventListener('submit', async (event) => {
     // Sanitize and collect data from form fields
     data.typeOfOrder = sanitizeInput(typeOfOrderHiddenInput.value);
     data.detailedDescription = sanitizeInput(detailedDescription.value);
-    // Format date for display
-    data.meetingDate = sanitizeInput(formatDateForDisplay(meetingDate.value));
+    // Send raw date value to Google Apps Script
+    data.meetingDate = sanitizeInput(meetingDate.value); // Send YYYY-MM-DD
 
     const selectedDate = meetingDate.value;
     const startTimeValue = meetingStartTime.value;
@@ -547,11 +545,9 @@ form.addEventListener('submit', async (event) => {
         meetingEndDateTime = new Date(`${selectedDate}T${endTimeValue}:00`);
     }
 
-    // Store original 24-hour times for backend consistency, and formatted for display
-    data.meetingStartTime = sanitizeInput(formatTimeForDisplay(startTimeValue)); // Formatted for FormEasy
-    // Correctly get the end time value as a 24-hour string for formatting
-    const formattedEndTime = meetingEndDateTime.toTimeString().substring(0, 5);
-    data.meetingEndTime = sanitizeInput(formatTimeForDisplay(formattedEndTime)); // Formatted for FormEasy
+    // Send raw 24-hour time strings to Google Apps Script
+    data.meetingStartTime = sanitizeInput(startTimeValue); // Send raw HH:MM
+    data.meetingEndTime = sanitizeInput(meetingEndDateTime.toTimeString().substring(0, 5)); // Send raw HH:MM
 
     data.fullName = sanitizeInput(fullName.value);
     data.emailAddress = sanitizeInput(emailAddress.value); // Emails should be validated with regex, but sanitizing still applies
@@ -608,7 +604,7 @@ form.addEventListener('submit', async (event) => {
             console.warn("Firebase not initialized or userId/appId missing, meeting not fully processed in Firestore.");
         }
 
-        // Populate submitted details on the success page
+        // Populate submitted details on the success page with FORMATTED values
         let detailsHtml = '';
         // Mapping of form field names to more readable labels
         const fieldLabels = {
@@ -625,10 +621,23 @@ form.addEventListener('submit', async (event) => {
             instagramHandle: 'Instagram Handle',
             twitterHandle: 'Twitter/X Handle'
         };
-        for (const key in data) {
-            if (data.hasOwnProperty(key) && data[key]) { // Only display fields that have a value
-                const label = fieldLabels[key] || key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()); // Convert camelCase to readable
-                detailsHtml += `<p class="mb-2"><span class="font-bold text-amber-200">${label}:</span> ${data[key]}</p>`;
+
+        // Create a temporary object for display purposes, applying formatting
+        const displayData = { ...data }; // Start with a copy of the raw data
+        displayData.meetingDate = formatDateForDisplay(data.meetingDate);
+        displayData.meetingStartTime = formatTimeForDisplay(data.meetingStartTime);
+        // Only format end time if it was actually provided (for custom duration)
+        if (customDurationRadio.checked) {
+             displayData.meetingEndTime = formatTimeForDisplay(data.meetingEndTime);
+        } else {
+             displayData.meetingEndTime = "N/A (1 Hour Meeting)"; // Or hide it, depending on preference
+        }
+
+
+        for (const key in displayData) { // Loop through the displayData
+            if (displayData.hasOwnProperty(key) && displayData[key] && displayData[key] !== "N/A (1 Hour Meeting)") {
+                const label = fieldLabels[key] || key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
+                detailsHtml += `<p class="mb-2"><span class="font-bold text-amber-200">${label}:</span> ${displayData[key]}</p>`;
             }
         }
         submittedDetailsDiv.innerHTML = detailsHtml;
