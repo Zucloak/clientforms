@@ -10,11 +10,6 @@
     <link rel="icon" type="image/png" href="/favicon/favicon-96x96.png" sizes="96x96">
     <link rel="shortcut icon" href="/favicon/favicon.ico" type="image/x-icon">
 
-    <link rel="apple-touch-icon" href="/favicon/apple-touch-icon.png" sizes="180x180">
-    <link rel="icon" type="image/png" href="/favicon/android-chrome-192x192.png" sizes="192x192">
-    <link rel="icon" type="image/png" href="/favicon/android-chrome-512x512.png" sizes="512x512">
-    <link rel="manifest" href="/favicon/site.webmanifest">
-
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts - Inter -->
@@ -142,12 +137,15 @@
                 <p class="text-sm text-gray-200 text-center mb-8">All fields in this section are required.</p>
 
                 <div class="relative">
-                    <label id="typeOfOrderLabel" class="block text-base font-medium text-gray-100 mb-2">Type of Order</label>
-                    <div id="customDropdownButton" class="mt-1 block w-full form-field cursor-pointer flex justify-between items-center" tabindex="0" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="typeOfOrderLabel">
-                        <span id="selectedOptionText">Select Order Type</span>
-                        <svg class="w-5 h-5 text-white transform transition-transform duration-200" id="dropdownArrow" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                    </div>
-                    <input type="hidden" id="typeOfOrder" name="typeOfOrder" required value="">
+                    <!-- Updated label for Type of Order for accessibility -->
+                    <label id="typeOfOrderLabel" class="block text-base font-medium text-gray-100 mb-2">
+                        Type of Order
+                        <div id="customDropdownButton" class="mt-1 block w-full form-field cursor-pointer flex justify-between items-center" tabindex="0" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="typeOfOrderLabel">
+                            <span id="selectedOptionText">Select Order Type</span>
+                            <svg class="w-5 h-5 text-white transform transition-transform duration-200" id="dropdownArrow" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </div>
+                        <input type="hidden" id="typeOfOrder" name="typeOfOrder" required value="">
+                    </label>
 
                     <ul id="dropdownOptions" class="absolute z-10 w-full mt-1 rounded-md shadow-lg overflow-hidden hidden custom-dropdown-options" role="listbox" aria-labelledby="typeOfOrderLabel">
                         <li class="px-4 py-2 cursor-pointer text-white" data-value="Branding">Branding</li>
