@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SYNAPPSE Order Request</title>
-    <!-- Favicons and Manifest - Corrected paths to the favicon/ directory -->
+   <!-- Favicons and Manifest - Corrected paths to the favicon/ directory -->
     <link rel="icon" type="image/png" href="/favicon/favicon-16x16.png" sizes="16x16">
     <link rel="icon" type="image/png" href="/favicon/favicon-32x32.png" sizes="32x32">
     <link rel="icon" type="image/png" href="/favicon/favicon-48x48.png" sizes="48x48">
@@ -22,24 +22,28 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts - Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Custom Stylesheet (extracted from inline <style> block) -->
-    <link rel="stylesheet" href="dist/style.css">
+
+    <!-- Custom CSS File -->
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Firebase SDK Initialization: This module will set global window.db, window.userId etc. -->
+    <!-- Ensure this file exists at 'dist/api/firebase-config.js' relative to this HTML file. -->
+    <script type="module" src="dist/api/firebase-config.js"></script>
 </head>
 <body class="flex flex-col items-center justify-center min-h-screen p-4 sm:p-6 md:p-8">
     <!-- Firebase Status Indicator -->
-    <!-- This element's content and styling will be managed by firebase-init.js and script.js -->
-    <div id="firebaseStatus" class="mb-4 text-center text-sm font-medium">
+    <!-- Hidden by default, shown only when status changes -->
+    <div id="firebaseStatus" class="mb-4 text-center text-sm font-medium hidden">
         Connecting to Forms...
     </div>
 
     <!-- Main form container with responsive styling and background -->
     <div id="formContainer" class="w-full form-container-responsive mx-auto bg-purple-900 bg-opacity-70 rounded-xl shadow-2xl p-6 sm:p-10 space-y-8">
         <h1 class="text-4xl sm:text-5xl font-extrabold text-white text-center mb-6 drop-shadow-lg">SYNAPPSE Order Request</h1>
-        
+
         <!-- Progress Indicator for multi-step form -->
         <div class="flex justify-center space-x-2 sm:space-x-4 mb-8">
-            <div id="step-indicator-0" class="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-sm sm:text-base font-bold bg-white text-purple-700 shadow-md">0</div>
+            <div id="step-indicator-0" class="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-sm sm:text-base font-bold bg-gray-300 text-gray-700 shadow-md">0</div>
             <div id="step-indicator-1" class="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-sm sm:text-base font-bold bg-gray-300 text-gray-700 shadow-md">1</div>
             <div id="step-indicator-2" class="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-sm sm:text-base font-bold bg-gray-300 text-gray-700 shadow-md">2</div>
             <div id="step-indicator-3" class="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-sm sm:text-base font-bold bg-gray-300 text-gray-700 shadow-md">3</div>
@@ -137,29 +141,29 @@
             </div>
 
             <!-- Step 1: Order Details -->
-          <!-- Step 1: Meeting Details (add this after meeting date/time fields) -->
-<div class="mt-4">
-  <label class="block text-base font-medium text-gray-100 mb-2">Meeting Duration</label>
-  <div class="flex flex-col sm:flex-row gap-2">
-    <label class="flex items-center">
-      <input type="radio" name="meetingDuration" value="1hour" checked class="form-radio mr-2">
-      1 Hour
-    </label>
-    <label class="flex items-center">
-      <input type="radio" name="meetingDuration" value="discussion" class="form-radio mr-2">
-      Full Discussion
-    </label>
-    <label class="flex items-center">
-      <input type="radio" name="meetingDuration" value="custom" class="form-radio mr-2">
-      Custom Time
-    </label>
-  </div>
-  <div id="customTimeFields" class="mt-2 hidden">
-    <label class="block text-sm text-gray-100">Start Time</label>
-    <input type="time" id="customStartTime" class="form-field w-full mb-2">
-    <label class="block text-sm text-gray-100">End Time</label>
-    <input type="time" id="customEndTime" class="form-field w-full">
-  </div>
+            <div id="step1" class="form-step hidden">
+                <h3 class="text-2xl sm:text-3xl font-bold text-white mb-6 text-center">Order Details</h3>
+                <p class="text-sm text-gray-200 text-center mb-8">All fields in this section are required.</p>
+
+                <div class="relative">
+                    <label for="typeOfOrder" class="block text-base font-medium text-gray-100 mb-2">Type of Order</label>
+                    <div id="customDropdownButton" class="mt-1 block w-full form-field cursor-pointer flex justify-between items-center" tabindex="0" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-controls="dropdownOptions">
+                        <span id="selectedOptionText">Select Order Type</span>
+                        <svg class="w-5 h-5 text-white transform transition-transform duration-200" id="dropdownArrow" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </div>
+                    <input type="hidden" id="typeOfOrder" name="typeOfOrder" required value="">
+
+                    <ul id="dropdownOptions" class="absolute z-10 w-full mt-1 rounded-md shadow-lg overflow-hidden hidden custom-dropdown-options" role="listbox" aria-labelledby="customDropdownButton">
+                        <li class="px-4 py-2 cursor-pointer text-white" data-value="Branding">Branding</li>
+                        <li class="px-4 py-2 cursor-pointer text-white" data-value="Web Design">Web Design</li>
+                        <li class="px-4 py-2 cursor-pointer text-white" data-value="Marketing Campaign">Marketing Campaign</li>
+                        <li class="px-4 py-2 cursor-pointer text-white" data-value="Content Creation">Content Creation</li>
+                        <li class="px-4 py-2 cursor-pointer text-white" data-value="Market Research">Market Research</li>
+                        <li class="px-4 py-2 cursor-pointer text-white" data-value="System Development">System Development</li>
+                        <li class="px-4 py-2 cursor-pointer text-white" data-value="Printed Materials">Printed Materials</li>
+                        <li class="px-4 py-2 cursor-pointer text-white" data-value="Personal Websites">Personal Websites</li>
+                        <li class="px-4 py-2 cursor-pointer text-white" data-value="Other">Other</li>
+                    </ul>
                 </div>
 
                 <div>
@@ -168,16 +172,36 @@
                                   class="mt-1 block w-full form-field"></textarea>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div class="w-full flex flex-col items-center date-time-input-group">
-                        <label for="meetingDate" class="block text-base font-medium text-gray-100 mb-2">Schedule a Meeting - Date</label>
-                        <input type="date" id="meetingDate" name="meetingDate" required
-                               class="mt-1 block w-full form-field">
+                <!-- Meeting Duration Options -->
+                <div class="space-y-4">
+                    <label class="block text-base font-medium text-gray-100 mb-2">Meeting Duration</label>
+                    <div class="flex items-center space-x-4">
+                        <label class="inline-flex items-center">
+                            <input type="radio" name="meetingDurationOption" value="fixed" class="form-radio h-4 w-4 text-purple-600" checked>
+                            <span class="ml-2 text-gray-200">1 Hour Meeting</span>
+                        </label>
+                        <label class="inline-flex items-center">
+                            <input type="radio" name="meetingDurationOption" value="custom" class="form-radio h-4 w-4 text-purple-600">
+                            <span class="ml-2 text-gray-200">Custom Duration</span>
+                        </label>
                     </div>
-                    <div class="w-full flex flex-col items-center date-time-input-group">
-                        <label for="meetingTime" class="block text-base font-medium text-gray-100 mb-2">Schedule a Meeting - Time</label>
-                        <input type="time" id="meetingTime" name="meetingTime" required
-                               class="mt-1 block w-full form-field">
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="w-full flex flex-col items-center date-time-input-group">
+                            <label for="meetingDate" class="block text-base font-medium text-gray-100 mb-2">Meeting Date</label>
+                            <input type="date" id="meetingDate" name="meetingDate" required
+                                   class="mt-1 block w-full form-field">
+                        </div>
+                        <div class="w-full flex flex-col items-center date-time-input-group">
+                            <label for="meetingStartTime" class="block text-base font-medium text-gray-100 mb-2">Meeting Start Time</label>
+                            <input type="time" id="meetingStartTime" name="meetingStartTime" required
+                                   class="mt-1 block w-full form-field">
+                        </div>
+                        <div id="meetingEndTimeGroup" class="w-full flex-col items-center date-time-input-group hidden sm:col-span-2">
+                             <label for="meetingEndTime" class="block text-base font-medium text-gray-100 mb-2">Meeting End Time</label>
+                             <input type="time" id="meetingEndTime" name="meetingEndTime"
+                                    class="mt-1 block w-full form-field">
+                        </div>
                     </div>
                 </div>
                 <button type="button" id="checkAvailabilityBtn" class="btn-secondary w-full sm:w-auto mt-4">Check Availability</button>
@@ -276,14 +300,7 @@
         </div>
     </div>
 
-
-    <!-- Firebase Configuration Proxy (Must be loaded BEFORE firebase-init.js) -->
-    <script type="module" src="api/firebase-config.js"></script>
-
-    <!-- Firebase SDK Initialization -->
-    <script type="module" src="dist/firebase-init.js"></script>
-
-    <!-- Main Application Logic (extracted from inline <script> block) -->
+    <!-- Custom JavaScript File -->
     <script type="module" src="dist/script.js"></script>
 </body>
 </html>
