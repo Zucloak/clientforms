@@ -21,51 +21,49 @@
 
 body {
     font-family: 'Inter', sans-serif;
-    /* Adjusted radial-gradient for even more subtle lighter movement and balanced darker shade */
-    /* Removed 'circle at 50% 50%' to make the 'light' appear only with background-position animation */
     background: radial-gradient(rgba(255, 255, 255, 0.000001), #5A0DA0, #3A0070);
-    background-size: 400% 400%; /* Larger background to allow for animation and smaller light appearance */
-    animation: movingGradient 16s ease infinite; /* Apply the new moving gradient animation */
-    color: #ffffff; /* White text for contrast */
-    overflow-x: hidden; /* Prevent horizontal scrollbars due to animations */
-    min-height: 100vh; /* Ensure body takes full viewport height */
+    background-size: 400% 400%;
+    animation: movingGradient 16s ease infinite;
+    color: #ffffff;
+    overflow-x: hidden;
+    min-height: 100vh;
 }
 /* Custom styles for input, textarea, and select focus states */
 input:focus, textarea:focus, select:focus {
-    outline: none; /* Remove default outline */
-    border-color: #fca311; /* Amber for focus border */
-    box-shadow: 0 0 0 3px rgba(252, 163, 17, 0.5); /* Shadow with amber tint */
+    outline: none;
+    border-color: #fca311;
+    box-shadow: 0 0 0 3px rgba(252, 163, 17, 0.5);
 }
 /* Style for all form fields (input, textarea, select) */
 .form-field {
-    background-color: rgba(255, 255, 255, 0.1); /* Slightly transparent white for fields */
-    border: 1px solid rgba(255, 255, 255, 0.3); /* Lighter border */
-    color: #ffffff; /* White text within fields */
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #ffffff;
     padding: 0.75rem 1rem;
     border-radius: 0.5rem;
-    transition: all 0.2s ease-in-out; /* Smooth transition for hover/focus */
+    transition: all 0.2s ease-in-out;
 }
 .form-field::placeholder {
-    color: rgba(255, 255, 255, 0.7); /* Lighter placeholder text */
+    color: rgba(255, 255, 255, 0.7);
 }
 .form-field:hover {
-    background-color: rgba(255, 255, 255, 0.15); /* Slightly less transparent on hover */
+    background-color: rgba(255, 255, 255, 0.15);
 }
 .form-field:focus {
-    background-color: rgba(255, 255, 255, 0.2); /* Even less transparent on focus */
+    background-color: rgba(255, 255, 255, 0.2);
 }
 /* Specific style for custom select dropdown options */
 .custom-dropdown-options {
-    background-color: #6a0dad; /* Darker background for options */
+    background-color: #6a0dad;
 }
 .custom-dropdown-options li:hover {
-    background-color: #8a2be2; /* Slightly lighter purple on hover */
+    background-color: #8a2be2;
 }
 
 /* Styling for primary button */
 .btn-primary {
-    background-color: #ffd700; /* gold */
-    color: #212529; /* Dark text for contrast */
+    background-color: #ffd700;
+    color: #212529;
     padding: 0.75rem 1.5rem;
     border-radius: 0.5rem;
     font-weight: 600;
@@ -73,13 +71,13 @@ input:focus, textarea:focus, select:focus {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 .btn-primary:hover {
-    background-color: #e69500; /* Darker amber on hover */
-    transform: translateY(-2px); /* Slight lift effect */
+    background-color: #e69500;
+    transform: translateY(-2px);
     box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
 }
 /* Styling for secondary button */
 .btn-secondary {
-    background-color: rgba(255, 255, 255, 0.2); /* Transparent white */
+    background-color: rgba(255, 255, 255, 0.2);
     color: #ffffff;
     padding: 0.75rem 1.5rem;
     border-radius: 0.5rem;
@@ -88,65 +86,74 @@ input:focus, textarea:focus, select:focus {
     border: 1px solid rgba(255, 255, 255, 0.3);
 }
 .btn-secondary:hover {
-    background-color: rgba(255, 255, 255, 0.3); /* Slightly less transparent on hover */
-    transform: translateY(-2px); /* Slight lift effect */
+    background-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
 }
 
 /* Custom CSS for mobile responsiveness */
-/* Make the main form container take more width on small screens */
 .form-container-responsive {
-    padding-left: 1rem; /* px-4 */
-    padding-right: 1rem; /* px-4 */
-    max-width: 100%; /* Default to full width */
+    padding-left: 1rem;
+    padding-right: 1rem;
+    max-width: 100%;
 }
 @media (min-width: 640px) { /* sm breakpoint and up */
     .form-container-responsive {
-        padding-left: 2.5rem; /* sm:px-10 */
-        padding-right: 2.5rem; /* sm:px-10 */
-        max-width: 48rem; /* sm:max-w-4xl */
+        padding-left: 2.5rem;
+        padding-right: 2.5rem;
+        max-width: 48rem;
     }
 }
 
-/* Remove explicit max-width from inputs, let them fill their parent's space */
-@media (max-width: 639px) { /* Targets screens smaller than sm breakpoint */
+/* IMPORTANT: New rules for compact date/time inputs on small screens */
+/* Ensure date/time input groups are centered and have a controlled max-width */
+.date-time-input-group {
+    width: 100%; /* Take full width of its grid cell */
+    /* On small screens (default, before sm:), apply max-width and center */
+    max-width: 250px; /* Adjust this value as needed, e.g., 200px or 70% */
+    margin-left: auto;
+    margin-right: auto;
+    /* Also ensure the text inside labels/inputs is centered */
+    text-align: center;
+}
+
+/* Override for larger screens (sm and up) if needed, though Tailwind's grid handles much of it */
+@media (min-width: 640px) {
     .date-time-input-group {
-        /* Removed specific max-width from input[type="date"], input[type="time"] */
-        /* The w-full on input will now respect the new parent container width */
-        width: 100%; /* Ensure the flex item takes full width */
-    }
-    .date-time-input-group label,
-    .date-time-input-group input {
-        text-align: center; /* Center text and input fields */
+        max-width: 100%; /* Allow to expand within sm:col-span-1 or sm:col-span-2 */
+        margin-left: 0;
+        margin-right: 0;
+        text-align: left; /* Reset text alignment for larger screens */
     }
 }
+
 
 /* Styles for the modal */
 .modal {
-    display: none; /* Hidden by default */
-    position: fixed; /* Stay in place */
-    z-index: 100; /* Sit on top */
+    display: none;
+    position: fixed;
+    z-index: 100;
     left: 0;
     top: 0;
-    width: 100%; /* Full width */
-    height: 100%; /* Full height */
-    overflow: auto; /* Enable scroll if needed */
-    background-color: rgba(0,0,0,0.8); /* Black w/ opacity */
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.8);
     justify-content: center;
     align-items: center;
 }
 
 .modal-content {
-    background-color: #4a0d80; /* Darker purple to match theme */
+    background-color: #4a0d80;
     margin: auto;
-    padding: 2.5rem; /* Increased padding */
-    border-radius: 1rem; /* More rounded corners */
-    width: 90%; /* Responsive width */
-    max-width: 700px; /* Max width for larger screens */
-    box-shadow: 0 5px 15px rgba(0,0,0,0.5); /* Stronger shadow */
+    padding: 2.5rem;
+    border-radius: 1rem;
+    width: 90%;
+    max-width: 700px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
     position: relative;
-    max-height: 80vh; /* Limit height to enable scrolling for long content */
-    overflow-y: auto; /* Enable scrolling within the modal content */
-    color: #ffffff; /* White text for contrast */
+    max-height: 80vh;
+    overflow-y: auto;
+    color: #ffffff;
 }
 
 .close-button {
@@ -154,7 +161,7 @@ input:focus, textarea:focus, select:focus {
     position: absolute;
     top: 1rem;
     right: 1.5rem;
-    font-size: 2rem; /* Larger close button */
+    font-size: 2rem;
     font-weight: bold;
     cursor: pointer;
     transition: color 0.2s ease-in-out;
@@ -162,31 +169,31 @@ input:focus, textarea:focus, select:focus {
 
 .close-button:hover,
 .close-button:focus {
-    color: #fff; /* White on hover */
+    color: #fff;
     text-decoration: none;
 }
 
 /* Added for scrollable terms section */
 .scrollable-terms {
-    max-height: 20rem; /* Adjust as needed, e.g., max-h-80 for more height */
+    max-height: 20rem;
     overflow-y: auto;
-    padding-right: 0.5rem; /* Add some padding to avoid scrollbar overlapping text */
-    scrollbar-width: thin; /* For Firefox */
-    scrollbar-color: #ffd700 #4a0d80; /* thumb and track color for Firefox */
+    padding-right: 0.5rem;
+    scrollbar-width: thin;
+    scrollbar-color: #ffd700 #4a0d80;
 }
 
 /* For Webkit browsers (Chrome, Safari) */
 .scrollable-terms::-webkit-scrollbar {
-    width: 8px; /* Width of the scrollbar */
+    width: 8px;
 }
 
 .scrollable-terms::-webkit-scrollbar-track {
-    background: #4a0d80; /* Track color */
+    background: #4a0d80;
     border-radius: 10px;
 }
 
 .scrollable-terms::-webkit-scrollbar-thumb {
-    background-color: #ffd700; /* Thumb color */
+    background-color: #ffd700;
     border-radius: 10px;
-    border: 2px solid #4a0d80; /* Border around the thumb */
+    border: 2px solid #4a0d80;
 }
