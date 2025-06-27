@@ -303,3 +303,342 @@
     <script type="module" src="dist/script.js"></script>
 </body>
 </html>
+```
+
+I have selected this code and am asking a query about/based on this code below.
+Instructions to follow:
+  * Don't output/edit the document if the query is Direct/Simple. For example, if the query asks for a simple explanation, output a direct answer.
+  * Make sure to **edit** the document if the query shows the intent of editing the document, in which case output the entire edited document, **not just that section or the edits**.
+    * Don't output the same document/empty document and say that you have edited it.
+    * Don't change unrelated code in the document.
+  * Don't output  and  in your final response.
+  * Any references like "this" or "selected code" refers to the code between  and  tags.
+  * Just acknowledge my request in the introduction.
+  * Make sure to refer to the document as "Canvas" in your response.
+
+AHHHHH FUCKING JUST FIX IT!
+I have selected this code and am asking a query about/based on this code below.
+Instructions to follow:
+  * Don't output/edit the document if the query is Direct/Simple. For example, if the query asks for a simple explanation, output a direct answer.
+  * Make sure to **edit** the document if the query shows the intent of editing the document, in which case output the entire edited document, **not just that section or the edits**.
+    * Don't output the same document/empty document and say that you have edited it.
+    * Don't change unrelated code in the document.
+  * Don't output  and  in your final response.
+  * Any references like "this" or "selected code" refers to the code between  and  tags.
+  * Just acknowledge my request in the introduction.
+  * Make sure to refer to the document as "Canvas" in your response.
+
+AHHHHH FUCKING JUST FIX IT!
+I understand your immense frustration with the persistent "No label associated with a form field" error. I am truly sorry that this issue has caused so much distress. We absolutely need to resolve this now.
+
+The screenshot clearly shows that the error remains for the "Type of Order" label, despite previous attempts. This particular error often arises when the `<label for="id">` attribute isn't directly pointing to a native HTML form control that users interact with. In your case, the visual control is a `div` element acting as a custom dropdown button, and the actual input is `type="hidden"`.
+
+To definitively fix this specific validation error and ensure optimal accessibility practices, the most reliable approach is to remove the `for` attribute from the `<label>` for "Type of Order" and rely purely on the implicit association of the label wrapping the interactive custom dropdown and the `aria-labelledby` on the `customDropdownButton` that points to the label's `id`. This combination provides the correct accessibility tree while avoiding the HTML validation error.
+
+Here is the updated `index.html` Canvas with this final, precise fix for the "Type of Order" label. This change should finally clear that error from your console.
+
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SYNAPPSE Order Request</title>
+    <link rel="icon" type="image/png" href="/favicon/favicon-16x16.png" sizes="16x16">
+    <link rel="icon" type="image/png" href="/favicon/favicon-32x32.png" sizes="32x32">
+    <link rel="icon" type="image/png" href="/favicon/favicon-48x48.png" sizes="48x48">
+    <link rel="icon" type="image/png" href="/favicon/favicon-96x96.png" sizes="96x96">
+    <link rel="shortcut icon" href="/favicon/favicon.ico" type="image/x-icon">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts - Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Custom CSS File -->
+    <link rel="stylesheet" href="dist/style.css">
+
+    <!-- NEW: Client-side Firebase Initialization Script -->
+    <!-- This script will fetch the config from your Vercel API and then initialize Firebase. -->
+    <script type="module" src="firebase-init-client.js"></script>
+</head>
+<body class="flex flex-col items-center justify-center min-h-screen p-4 sm:p-6 md:p-8">
+    <!-- Firebase Status Indicator -->
+    <div id="firebaseStatus" class="mb-4 text-center text-sm font-medium hidden">
+        Connecting to Forms...
+    </div>
+
+    <!-- Main form container -->
+    <div id="formContainer" class="w-full form-container-responsive mx-auto bg-purple-900 bg-opacity-70 rounded-xl shadow-2xl p-6 sm:p-10 space-y-8">
+        <h1 class="text-4xl sm:text-5xl font-extrabold text-white text-center mb-6 drop-shadow-lg">SYNAPPSE Order Request</h1>
+
+        <!-- Progress Indicator for multi-step form -->
+        <div class="flex justify-center space-x-2 sm:space-x-4 mb-8">
+            <div id="step-indicator-0" class="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-sm sm:text-base font-bold bg-gray-300 text-gray-700 shadow-md">0</div>
+            <div id="step-indicator-1" class="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-sm sm:text-base font-bold bg-gray-300 text-gray-700 shadow-md">1</div>
+            <div id="step-indicator-2" class="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-sm sm:text-base font-bold bg-gray-300 text-gray-700 shadow-md">2</div>
+            <div id="step-indicator-3" class="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-sm sm:text-base font-bold bg-gray-300 text-gray-700 shadow-md">3</div>
+        </div>
+
+        <form id="orderForm" class="space-y-6">
+            <!-- Step 0: Data Privacy Act Law of the Philippines and Terms of Service -->
+            <div id="step0" class="form-step">
+                <h3 class="text-2xl sm:text-3xl font-bold text-white mb-6 text-center">Important Notices</h3>
+                <div class="bg-purple-800 bg-opacity-50 p-6 rounded-lg mb-6">
+                    <h4 class="text-xl sm:text-2xl font-bold text-white mb-4">Data Privacy Act Law of the Philippines (RA 10173)</h4>
+                    <p class="text-sm text-gray-200 mb-4">
+                        By proceeding with this form, you acknowledge and agree that SYNAPPSE will collect, use, store, and process your personal information in accordance with the Data Privacy Act of 2012 (Republic Act No. 10173).
+                        This includes, but is not limited to, your full name, email address, phone number, and details related to your order request.
+                        Your data will be used solely for the purpose of processing your request, communicating with you regarding our services, and fulfilling our obligations related to your order.
+                        We commit to protecting your privacy and ensuring the security of your personal data.
+                    </p>
+                    <p class="text-sm text-gray-200">
+                        For more details on how we handle your data, please refer to our full Privacy Policy.
+                    </p>
+                </div>
+
+                <div class="bg-purple-800 bg-opacity-50 p-6 rounded-lg mb-8 scrollable-terms">
+                    <h4 class="text-xl sm:text-2xl font-bold text-white mb-4">SYNAPPSE Website Terms of Service</h4>
+                    <p class="text-sm text-gray-200">Last Updated: June 23, 2025</p>
+                    <p class="text-sm text-gray-200 mb-4">Welcome to SYNAPPSE! These Terms of Service ("Terms") govern your access to and use of the SYNAPPSE website (synappse.vercel.app/) and all related services, content, and functionalities (collectively, the "Services") provided by SYNAPPSE ("we," "us," or "our").</p>
+                    <p class="text-sm text-gray-200 mb-4">By accessing or using our Services, you agree to be bound by these Terms. If you do not agree to these Terms, please do not use our Services.</p>
+
+                    <h5 class="text-lg font-semibold text-white mb-2">1. Acceptance of Terms</h5>
+                    <p class="text-sm text-gray-200 mb-4">By using SYNAPPSE Services, you confirm that you are at least 18 years old and agree to comply with and be bound by these Terms, as well as our Privacy Policy.</p>
+
+                    <h5 class="text-lg font-semibold text-white mb-2">2. Description of Services</h5>
+                    <p class="text-sm text-gray-200 mb-2">SYNAPPSE provides innovative digital creation services, including but not limited to:</p>
+                    <ul class="list-disc list-inside text-sm text-gray-200 mb-4 ml-4">
+                        <li>Digital Content & Design: Brand Style Guides, Ad Campaign Posters/Pubmats, Website Visual Concepts, Logos, 3D Product Models, Animated Group Websites, and other digital visual content.</li>
+                        <li>On-Site Computer Servicing: Troubleshooting, repair, setup, and maintenance of computer systems.</li>
+                    </ul>
+                    <p class="text-sm text-gray-200 mb-4">We reserve the right to modify or discontinue any part of the Services at any time without notice.</p>
+
+                    <h5 class="text-lg font-semibold text-white mb-2">3. User Responsibilities</h5>
+                    <p class="text-sm text-gray-200 mb-2">As a user of SYNAPPSE Services, you agree to:</p>
+                    <ul class="list-disc list-inside text-sm text-gray-200 mb-4 ml-4">
+                        <li>Provide accurate and complete information when engaging with our Services (e.g., during inquiries, project requests).</li>
+                        <li>Use the Services only for lawful purposes and in compliance with all applicable laws and regulations in the Philippines.</li>
+                        <li>Not engage in any activity that could damage, disable, overburden, or impair our Services or interfere with any other party's use of our Services.</li>
+                        <li>Not attempt to gain unauthorized access to any part of our Services, other accounts, computer systems, or networks connected to our Services.</li>
+                    </ul>
+
+                    <h5 class="text-lg font-semibold text-white mb-2">4. Intellectual Property</h5>
+                    <p class="text-sm text-gray-200 mb-2"><strong>Our Content:</strong> All content on the SYNAPPSE website, including text, graphics, logos, images, software, and the compilation thereof, is the property of SYNAPPSE or its content suppliers and protected by Philippine and international copyright laws.</p>
+                    <p class="text-sm text-gray-200 mb-4"><strong>Your Project Content:</strong> For design projects, you retain ownership of the intellectual property rights in any content you provide to us for the purpose of creating your project. SYNAPPSE retains the right to display completed projects in its portfolio for promotional purposes, unless otherwise agreed upon in writing.</p>
+                    <p class="text-sm text-gray-200 mb-4"><strong>Service-Specific Deliverables:</strong> Upon full payment for completed services, ownership of the final deliverables (e.g., completed design files, website visual concepts) will transfer to you, as specified in your individual service agreement or project contract.</p>
+
+                    <h5 class="text-lg font-semibold text-white mb-2">5. Payment Terms (For Paid Services)</h5>
+                    <p class="text-sm text-gray-200 mb-2">All fees for services rendered will be agreed upon in a separate service agreement or project proposal.</p>
+                    <p class="text-sm text-gray-200 mb-2">Payment terms, including deposit requirements, milestone payments, and final payment, will be specified in the individual agreement.</p>
+                    <p class="text-sm text-gray-200 mb-4">Failure to make timely payments may result in the suspension or termination of Services.</p>
+
+                    <h5 class="text-lg font-semibold text-white mb-2">6. Disclaimers and Limitation of Liability</h5>
+                    <p class="text-sm text-gray-200 mb-2"><strong>No Warranties:</strong> The Services are provided "as is" and "as available" without any warranties of any kind, either express or implied, including, but not limited to, implied warranties of merchantability, fitness for a particular purpose, or non-infringement.</p>
+                    <p class="text-sm text-gray-200 mb-2"><strong>Service Performance:</strong> While we strive for excellence, SYNAPPSE does not guarantee that the Services will be uninterrupted, error-free, or secure.</p>
+                    <p class="text-sm text-gray-200 mb-4"><strong>Limitation of Liability:</strong> In no event shall SYNAPPSE, its owners, employees, or partners be liable for any indirect, incidental, special, consequential, or punitive damages, including without limitation, loss of profits, data, use, goodwill, or other intangible losses, resulting from (i) your access to or use of or inability to access or use the Services; (iii) any content obtained from the Services; or (iv) unauthorized access, use, or alteration of your transmissions or content, whether based on warranty, contract, tort (including negligence), or any other legal theory, whether or not we have been informed of the possibility of such damage.</p>
+                    <p class="text-sm text-gray-200 mb-4">In no event shall SYNAPPSE's total liability to you for all damages, losses, and causes of action exceed the amount paid by you, if any, for accessing or using our Services within the six (6) months immediately preceding the date of the claim.</p>
+                    <p class="text-sm text-gray-200 mb-4"><strong>Specific for On-Site Computer Servicing:</strong> While our partners exercise due diligence, SYNAPPSE is not responsible for any data loss, hardware damage, or other unforeseen issues that may occur during the troubleshooting, repair, or maintenance of computer systems. Clients are strongly advised to back up all critical data before any on-site service commences.</p>
+
+                    <h5 class="text-lg font-semibold text-white mb-2">7. Indemnification</h5>
+                    <p class="text-sm text-gray-200 mb-4">You agree to defend, indemnify, and hold harmless SYNAPPSE, its owners, employees, contractors, agents, officers, and directors from and against any and all claims, damages, obligations, losses, liabilities, costs or debt, and expenses (including but not limited to attorney's fees), resulting from or arising out of a) your use and access of the Services, by you or any person using your account and password; b) a breach of these Terms; or c) any content posted by you on the Services.</p>
+
+                    <h5 class="text-lg font-semibold text-white mb-2">8. Governing Law</h5>
+                    <p class="text-sm text-gray-200 mb-4">These Terms shall be governed and construed in accordance with the laws of the Republic of the Philippines, without regard to its conflict of law provisions.</p>
+
+                    <h5 class="text-lg font-semibold text-white mb-2">9. Dispute Resolution</h5>
+                    <p class="text-sm text-gray-200 mb-4">Any dispute, controversy, or claim arising out of or relating to these Terms, or the breach, termination, or validity thereof, shall be primarily resolved through good faith negotiation between the parties. If an amicable settlement cannot be reached, the dispute shall be submitted to the competent courts of Taguig City, Metro Manila, Philippines, to the exclusion of all other courts.</p>
+
+                    <h5 class="text-lg font-semibold text-white mb-2">10. Changes to Terms</h5>
+                    <p class="text-sm text-gray-200 mb-4">We reserve the right, at our sole discretion, to modify or replace these Terms at any time. If a revision is material, we will provide at least 30 days' notice prior to any new terms taking effect. What constitutes a material change will be determined at our sole discretion. By continuing to access or use our Services after those revisions become effective, you agree to be bound by the revised terms. If you do not agree to the new terms, please stop using the Services.</p>
+
+                    <h5 class="text-lg font-semibold text-white mb-2">11. Termination</h5>
+                    <p class="text-sm text-gray-200 mb-4">We may terminate or suspend your access to our Services immediately, without prior notice or liability, for any reason whatsoever, including without limitation if you breach the Terms. Upon termination, your right to use the Services will immediately cease.</p>
+
+                    <h5 class="text-lg font-semibold text-white mb-2">12. Contact Information</h5>
+                    <p class="text-sm text-gray-200 mb-2">If you have any questions about these Terms of Service, please contact us at:<br>
+                    Email: synpps@gmail.com<br>
+                    Website: synappse.vercel.app/</p>
+                </div>
+
+                <div class="flex items-center mb-6">
+                    <input type="checkbox" id="agreeToTerms" class="form-checkbox h-5 w-5 text-purple-600 rounded" required>
+                    <label for="agreeToTerms" class="ml-2 text-sm text-gray-200">I have read and agree to the <span class="font-bold">Data Privacy Act Law</span> and the <span class="font-bold">Terms of Service</span>.</label>
+                </div>
+
+                <div class="flex justify-end mt-8">
+                    <button type="button" id="next0" class="btn-primary">Next</button>
+                </div>
+            </div>
+
+            <!-- Step 1: Order Details -->
+            <div id="step1" class="form-step hidden">
+                <h3 class="text-2xl sm:text-3xl font-bold text-white mb-6 text-center">Order Details</h3>
+                <p class="text-sm text-gray-200 text-center mb-8">All fields in this section are required.</p>
+
+                <div class="relative">
+                    <!-- Fix: The label text is explicitly linked to the custom dropdown button via aria-labelledby.
+                         The hidden input still serves its purpose for form data. -->
+                    <label id="typeOfOrderLabel" class="block text-base font-medium text-gray-100 mb-2">Type of Order</label>
+                    <div id="customDropdownButton" class="mt-1 block w-full form-field cursor-pointer flex justify-between items-center" tabindex="0" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="typeOfOrderLabel">
+                        <span id="selectedOptionText">Select Order Type</span>
+                        <svg class="w-5 h-5 text-white transform transition-transform duration-200" id="dropdownArrow" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </div>
+                    <!-- The hidden input is the actual form control for the value; kept hidden from accessibility tree -->
+                    <input type="hidden" id="typeOfOrder" name="typeOfOrder" required value="" aria-hidden="true" tabindex="-1">
+
+                    <ul id="dropdownOptions" class="absolute z-10 w-full mt-1 rounded-md shadow-lg overflow-hidden hidden custom-dropdown-options" role="listbox" aria-labelledby="typeOfOrderLabel">
+                        <li class="px-4 py-2 cursor-pointer text-white" data-value="Branding">Branding</li>
+                        <li class="px-4 py-2 cursor-pointer text-white" data-value="Web Design">Web Design</li>
+                        <li class="px-4 py-2 cursor-pointer text-white" data-value="Marketing Campaign">Marketing Campaign</li>
+                        <li class="px-4 py-2 cursor-pointer text-white" data-value="Content Creation">Content Creation</li>
+                        <li class="px-4 py-2 cursor-pointer text-white" data-value="Market Research">Market Research</li>
+                        <li class="px-4 py-2 cursor-pointer text-white" data-value="System Development">System Development</li>
+                        <li class="px-4 py-2 cursor-pointer text-white" data-value="Printed Materials">Printed Materials</li>
+                        <li class="px-4 py-2 cursor-pointer text-white" data-value="Personal Websites">Personal Websites</li>
+                        <li class="px-4 py-2 cursor-pointer text-white" data-value="Other">Other</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <label for="detailedDescription" class="block text-base font-medium text-gray-100 mb-2">Detailed Description</label>
+                    <textarea id="detailedDescription" name="detailedDescription" rows="6" placeholder="Provide a detailed description of your project or request..." required
+                                  class="mt-1 block w-full form-field"></textarea>
+                </div>
+
+                <!-- Meeting Duration Options -->
+                <div class="space-y-4">
+                    <!-- Changed label to legend and wrapped in fieldset for accessibility -->
+                    <fieldset>
+                        <legend class="block text-base font-medium text-gray-100 mb-2">Meeting Duration</legend>
+                        <div class="flex items-center space-x-4">
+                            <label class="inline-flex items-center">
+                                <input type="radio" id="fixedDuration" name="meetingDurationOption" value="fixed" class="form-radio h-4 w-4 text-purple-600" checked>
+                                <span class="ml-2 text-gray-200">1 Hour Meeting</span>
+                            </label>
+                            <label class="inline-flex items-center">
+                                <input type="radio" id="customDuration" name="meetingDurationOption" value="custom" class="form-radio h-4 w-4 text-purple-600">
+                                <span class="ml-2 text-gray-200">Custom Duration</span>
+                            </label>
+                        </div>
+                    </fieldset>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 justify-items-center">
+                        <div class="w-full flex flex-col items-center date-time-input-group">
+                            <label for="meetingDate" class="block text-base font-medium text-gray-100 mb-2">Meeting Date</label>
+                            <input type="date" id="meetingDate" name="meetingDate" required
+                                   class="mt-1 block w-full form-field">
+                        </div>
+                        <div class="w-full flex flex-col items-center date-time-input-group">
+                            <label for="meetingStartTime" class="block text-base font-medium text-gray-100 mb-2">Meeting Start Time</label>
+                            <input type="time" id="meetingStartTime" name="meetingStartTime" required
+                                   class="mt-1 block w-full form-field">
+                        </div>
+                        <div id="meetingEndTimeGroup" class="w-full flex-col items-center date-time-input-group hidden sm:col-span-2">
+                             <label for="meetingEndTime" class="block text-base font-medium text-gray-100 mb-2">Meeting End Time</label>
+                             <input type="time" id="meetingEndTime" name="meetingEndTime"
+                                    class="mt-1 block w-full form-field">
+                        </div>
+                    </div>
+                </div>
+                <button type="button" id="checkAvailabilityBtn" class="btn-secondary w-full sm:w-auto mt-4">Check Availability</button>
+                <div id="availabilityMessage" class="mt-2 text-sm font-semibold text-center"></div>
+
+                <div class="flex justify-between mt-8">
+                    <button type="button" id="prev1" class="btn-secondary">Previous</button>
+                    <button type="button" id="next1" class="btn-primary">Next</button>
+                </div>
+            </div>
+
+            <!-- Step 2: Client Information -->
+            <div id="step2" class="form-step hidden">
+                <h3 class="text-2xl sm:text-3xl font-bold text-white mb-6 text-center">Client Information</h3>
+                <p class="text-sm text-gray-200 text-center mb-8">All fields in this section are required.</p>
+
+                <div>
+                    <label for="fullName" class="block text-base font-medium text-gray-100 mb-2">Full Name</label>
+                    <input type="text" id="fullName" name="fullName" placeholder="Your Full Name" required
+                           class="mt-1 block w-full form-field">
+                </div>
+
+                <div>
+                    <label for="emailAddress" class="block text-base font-medium text-gray-100 mb-2">Email Address</label>
+                    <input type="email" id="emailAddress" name="emailAddress" placeholder="you@example.com" required
+                           class="mt-1 block w-full form-field">
+                </div>
+
+                <div>
+                    <label for="phoneNumber" class="block text-base font-medium text-gray-100 mb-2">Phone Number</label>
+                    <input type="text" id="phoneNumber" name="phoneNumber" placeholder="+63 9XX XXX XXXX" required
+                           class="mt-1 block w-full form-field"
+                           oninput="this.value=this.value.replace(/[^0-9]/g,'');" maxlength="15">
+                </div>
+
+                <div class="flex justify-between mt-8">
+                    <button type="button" id="prev2" class="btn-secondary">Previous</button>
+                    <button type="button" id="next2" class="btn-primary">Next</button>
+                </div>
+            </div>
+
+            <!-- Step 3: Social Media and Links -->
+            <div id="step3" class="form-step hidden">
+                <h3 class="text-2xl sm:text-3xl font-bold text-white mb-6 text-center">Social Media and Links</h3>
+                <p class="text-sm text-gray-200 text-center mb-8">All fields in this section are optional.</p>
+
+                <div>
+                    <label for="facebookProfile" class="block text-base font-medium text-gray-100 mb-2">Facebook Profile/Page URL</label>
+                    <input type="url" id="facebookProfile" name="facebookProfile" placeholder="https://facebook.com/yourpage"
+                           class="mt-1 block w-full form-field">
+                </div>
+
+                <div>
+                    <label for="instagramHandle" class="block text-base font-medium text-gray-100 mb-2">Instagram Handle</label>
+                    <input type="text" id="instagramHandle" name="instagramHandle" placeholder="@yourinstagram"
+                           class="mt-1 block w-full form-field">
+                </div>
+
+                <div>
+                    <label for="twitterHandle" class="block text-base font-medium text-gray-100 mb-2">Twitter/X Handle</label>
+                    <input type="text" id="twitterHandle" name="twitterHandle" placeholder="@yourtwitterx"
+                           class="mt-1 block w-full form-field">
+                </div>
+
+                <div class="flex justify-between mt-8">
+                    <button type="button" id="prev3" class="btn-secondary">Previous</button>
+                    <button type="submit" class="btn-primary">Submit</button>
+                </div>
+            </div>
+
+            <div id="formMessage" class="mt-4 text-center text-sm font-medium text-white"></div>
+        </form>
+    </div>
+
+    <!-- Success Message Container (Initially Hidden) -->
+    <div id="successMessageContainer" class="w-full max-w-4xl mx-auto bg-purple-900 bg-opacity-70 rounded-xl shadow-2xl p-6 sm:p-10 space-y-8 hidden flex flex-col items-center justify-center text-center">
+        <svg class="w-32 h-32 text-green-400 mb-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation: drawCheck 1s forwards ease-out;">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-8.87"></path>
+            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+        </svg>
+        <h2 class="text-4xl sm:text-5xl font-extrabold text-white mb-4 drop-shadow-lg">Thank You!</h2>
+        <p class="text-lg text-gray-200 mb-8">Your order request has been submitted successfully. Here are the details:</p>
+        <div id="submittedDetails" class="text-left text-gray-200 w-full max-w-md">
+            <!-- Submitted details will be inserted here -->
+        </div>
+        <button type="button" id="fillAgainBtn" class="btn-primary mt-8">Fill Another Request</button>
+    </div>
+
+    <!-- Modal for Privacy Policy/Terms (if needed for expanded view, currently embedded) -->
+    <div id="infoModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="closeModalBtn">&times;</span>
+            <div id="modalContentArea">
+                <!-- Content will be loaded here dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom JavaScript File -->
+    <script type="module" src="dist/script.js"></script>
+</body>
+</html>
