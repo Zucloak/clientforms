@@ -100,7 +100,7 @@ const detailedDescription = document.getElementById('detailedDescription');
 
 // New Duration Option elements
 const fixedDurationRadio = document.querySelector('input[name="meetingDurationOption"][value="fixed"]');
-const customDurationRadio = document.querySelector('input[name="meetingDurationOption"][value="custom"]');
+const customDurationRadio = document.querySelector('input[name="meetingDurationOption"][value="custom']');
 const meetingEndTimeGroup = document.getElementById('meetingEndTimeGroup'); // Div that holds the end time input
 
 const meetingDate = document.getElementById('meetingDate');
@@ -427,7 +427,11 @@ checkAvailabilityBtn.addEventListener('click', async () => {
     }
 });
 
-// Function to convert 24-hour time to 12-hour AM/PM format
+/**
+ * Function to convert 24-hour time to 12-hour AM/PM format.
+ * @param {string} time24h - Time string in HH:MM format (24-hour).
+ * @returns {string} Formatted time string (e.g., "04:15 PM").
+ */
 function formatTimeForDisplay(time24h) {
     if (!time24h) return '';
     const [hours, minutes] = time24h.split(':').map(Number);
@@ -435,6 +439,18 @@ function formatTimeForDisplay(time24h) {
     const formattedHours = hours % 12 || 12; // Convert 0 (midnight) to 12 AM, and hours > 12 to 12-hour format
     return `${formattedHours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')} ${period}`;
 }
+
+/**
+ * Function to convert YYYY-MM-DD date string to a more readable format.
+ * @param {string} dateString - Date string in YYYY-MM-DD format.
+ * @returns {string} Formatted date string (e.g., "June 28, 2025").
+ */
+function formatDateForDisplay(dateString) {
+    if (!dateString) return '';
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    return new Date(dateString).toLocaleDateString(undefined, options);
+}
+
 
 // Custom Dropdown Logic
 customDropdownButton.addEventListener('click', () => {
@@ -512,7 +528,8 @@ form.addEventListener('submit', async (event) => {
     // Sanitize and collect data from form fields
     data.typeOfOrder = sanitizeInput(typeOfOrderHiddenInput.value);
     data.detailedDescription = sanitizeInput(detailedDescription.value);
-    data.meetingDate = sanitizeInput(meetingDate.value); // Dates are generally safer, but sanitizing doesn't hurt.
+    // Format date for display
+    data.meetingDate = sanitizeInput(formatDateForDisplay(meetingDate.value));
 
     const selectedDate = meetingDate.value;
     const startTimeValue = meetingStartTime.value;
@@ -532,7 +549,9 @@ form.addEventListener('submit', async (event) => {
 
     // Store original 24-hour times for backend consistency, and formatted for display
     data.meetingStartTime = sanitizeInput(formatTimeForDisplay(startTimeValue)); // Formatted for FormEasy
-    data.meetingEndTime = sanitizeInput(formatTimeForDisplay(meetingEndDateTime.toTimeString().substring(0, 5))); // Formatted for FormEasy
+    // Correctly get the end time value as a 24-hour string for formatting
+    const formattedEndTime = meetingEndDateTime.toTimeString().substring(0, 5);
+    data.meetingEndTime = sanitizeInput(formatTimeForDisplay(formattedEndTime)); // Formatted for FormEasy
 
     data.fullName = sanitizeInput(fullName.value);
     data.emailAddress = sanitizeInput(emailAddress.value); // Emails should be validated with regex, but sanitizing still applies
