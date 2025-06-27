@@ -1,6 +1,5 @@
 // script.js
 // Import necessary Firestore modules for direct use in this script.
-// DO NOT TAMPER THE OBFUSCATION, DOING SO WILL VIOLATE THE INTERNATIONAL LAW OF COPYRIGHT! 
 // db, userId, appId, and Timestamp will be retrieved from the window object.
 import { collection, query, where, getDocs, addDoc, Timestamp, endAt, startAt } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
@@ -550,15 +549,16 @@ form.addEventListener('submit', async (event) => {
         meetingEndDateTime = new Date(`${selectedDate}T${endTimeValue}:00`);
     }
 
-    // Send raw 24-hour time strings to Google Apps Script
-    data.meetingStartTime = sanitizeInput(startTimeValue); // Send raw HH:MM
-    data.meetingEndTime = sanitizeInput(meetingEndDateTime.toTimeString().substring(0, 5)); // Send raw HH:MM
+    // FIX: Convert to 12-hour format with AM/PM before sending to Google Sheets
+    data.meetingStartTime = sanitizeInput(formatTimeForDisplay(startTimeValue));
+    data.meetingEndTime = sanitizeInput(formatTimeForDisplay(meetingEndDateTime.toTimeString().substring(0, 5)));
 
     data.fullName = sanitizeInput(fullName.value);
     data.emailAddress = sanitizeInput(emailAddress.value); // Emails should be validated with regex, but sanitizing still applies
     data.phoneNumber = sanitizeInput(phoneNumber.value); // Phone numbers should be validated for format, sanitizing applied
     data.facebookProfile = sanitizeInput(facebookProfile.value); // URLs should also be validated later
-    data.instagramHandle = sanitizeInput(instagramHandle.handle); // Changed from .value to .handle as per common usage
+    // FIX: Changed to .value, assuming instagramHandle is a standard text input
+    data.instagramHandle = sanitizeInput(instagramHandle.value);
     data.twitterHandle = sanitizeInput(twitterHandle.value);
     data.meetingDurationType = fixedDurationRadio.checked ? '1 Hour Meeting' : 'Custom Duration';
 
