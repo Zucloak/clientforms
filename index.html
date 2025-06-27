@@ -170,17 +170,20 @@
 
                 <!-- Meeting Duration Options -->
                 <div class="space-y-4">
-                    <label for="fixedDuration" class="block text-base font-medium text-gray-100 mb-2">Meeting Duration</label>
-                    <div class="flex items-center space-x-4">
-                        <label class="inline-flex items-center">
-                            <input type="radio" id="fixedDuration" name="meetingDurationOption" value="fixed" class="form-radio h-4 w-4 text-purple-600" checked>
-                            <span class="ml-2 text-gray-200">1 Hour Meeting</span>
-                        </label>
-                        <label class="inline-flex items-center">
-                            <input type="radio" id="customDuration" name="meetingDurationOption" value="custom" class="form-radio h-4 w-4 text-purple-600">
-                            <span class="ml-2 text-gray-200">Custom Duration</span>
-                        </label>
-                    </div>
+                    <!-- Changed label to legend and wrapped in fieldset for accessibility -->
+                    <fieldset>
+                        <legend class="block text-base font-medium text-gray-100 mb-2">Meeting Duration</legend>
+                        <div class="flex items-center space-x-4">
+                            <label class="inline-flex items-center">
+                                <input type="radio" id="fixedDuration" name="meetingDurationOption" value="fixed" class="form-radio h-4 w-4 text-purple-600" checked>
+                                <span class="ml-2 text-gray-200">1 Hour Meeting</span>
+                            </label>
+                            <label class="inline-flex items-center">
+                                <input type="radio" id="customDuration" name="meetingDurationOption" value="custom" class="form-radio h-4 w-4 text-purple-600">
+                                <span class="ml-2 text-gray-200">Custom Duration</span>
+                            </label>
+                        </div>
+                    </fieldset>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 justify-items-center">
                         <div class="w-full flex flex-col items-center date-time-input-group">
