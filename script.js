@@ -1,5 +1,6 @@
 // script.js
 // Import necessary Firestore modules for direct use in this script.
+// DO NOT TAMPER THE OBFUSCATION, DOING SO WILL VIOLATE THE INTERNATIONAL LAW OF COPYRIGHT! 
 // db, userId, appId, and Timestamp will be retrieved from the window object.
 import { collection, query, where, getDocs, addDoc, Timestamp, endAt, startAt } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
