@@ -628,7 +628,6 @@ form.addEventListener('submit', async (event) => {
             twitterHandle: 'Twitter/X Handle'
         };
 
-        // **FIX STARTS HERE**
         // Create a temporary object for display purposes. The `data` object already contains
         // the correctly formatted time strings (e.g., "'04:30 PM'"). The issue was calling
         // `formatTimeForDisplay` again on these already-formatted strings, which corrupted them.
@@ -645,7 +644,6 @@ form.addEventListener('submit', async (event) => {
         } else {
              displayData.meetingEndTime = "N/A (1 Hour Meeting)";
         }
-        // **FIX ENDS HERE**
 
         for (const key in displayData) { // Loop through the displayData
             if (displayData.hasOwnProperty(key) && displayData[key] && displayData[key] !== "N/A (1 Hour Meeting)") {
@@ -653,6 +651,15 @@ form.addEventListener('submit', async (event) => {
                 detailsHtml += `<p class="mb-2"><span class="font-bold text-amber-200">${label}:</span> ${displayData[key]}</p>`;
             }
         }
+        
+        // Add a creative and professional marketing message
+        detailsHtml += `<hr class="my-6 border-purple-400 opacity-30">`; // A subtle separator
+        detailsHtml += `<div class="mt-4 text-center">
+            <p class="text-amber-100 text-sm">
+                <span class="font-bold">A Pro Tip:</span> Punctuality pays off! Arrive a few minutes early to our scheduled meeting, and you might unlock an exclusive deal. We look forward to connecting with you.
+            </p>
+        </div>`;
+        
         submittedDetailsDiv.innerHTML = detailsHtml;
 
 
