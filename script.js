@@ -4,12 +4,11 @@
 import { collection, query, where, getDocs, addDoc, Timestamp, endAt, startAt } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
 // Declare variables to hold Firebase objects.
-// These will be populated from the window object once firebase-config.js has run.
+// These will be populated from the window object once firebase-init-client.js has run.
 let db;
 let userId;
 let appId;
 // Timestamp is directly imported now, so no need to get it from window
-// Let's re-declare it to avoid conflicts with Firebase's Timestamp constructor.
 // For this setup, we'll rely on the imported Timestamp from firestore.
 
 /**
@@ -49,12 +48,11 @@ const checkFirebaseReady = () => {
         let checkCount = 0;
         const maxChecks = 50; // Try for 5 seconds (50 checks * 100ms)
         const interval = setInterval(() => {
-            // Check if window properties set by firebase-config.js are available
+            // Check if window properties set by firebase-init-client.js are available
             if (window.db && window.userId && window.appId) {
                 db = window.db; // Assign to local module variables
                 userId = window.userId;
                 appId = window.appId;
-                // Timestamp is imported directly from Firestore, so no need to get from window for that specific object.
                 clearInterval(interval);
                 console.log("script.js: Firebase globals are ready in main script.");
                 updateFirebaseStatusUI("Forms are updated in real time.", "success");
@@ -380,15 +378,18 @@ checkAvailabilityBtn.addEventListener('click', async () => {
         availabilityMessage.classList.remove('text-green-500', 'text-red-500');
         availabilityMessage.classList.add('text-yellow-500');
 
-        // Query all meetings for the selected day
-        // To query for a specific day, get the start and end of that day as Timestamps
+        // Query all meetings for the selected day from 'bookingDateTimes'
+        // This is the key change to align with your security rules.
         const startOfDay = new Date(date);
-        startOfDay.setHours(0, 0, 0, 0); // Set to start of the day
+        startOfDay.setHours(0, 0, 0, 0);
         const endOfDay = new Date(date);
-        endOfDay.setHours(23, 59, 59, 999); // Set to end of the day
+        endOfDay.setHours(23, 59, 59, 999);
 
-        const meetingsRef = collection(db, 'artifacts', appId, 'public', 'data', 'bookedMeetings');
-        // Use a range query for the day to minimize fetched data
+        // --- IMPORTANT CHANGE HERE ---
+        // Changed collection from 'bookedMeetings' to 'bookingDateTimes' for read access
+        const meetingsRef = collection(db, 'artifacts', appId, 'public', 'data', 'bookingDateTimes');
+        // --- END IMPORTANT CHANGE ---
+
         const q = query(meetingsRef, 
             where('startTime', '>=', Timestamp.fromDate(startOfDay)),
             where('startTime', '<=', Timestamp.fromDate(endOfDay))
@@ -560,22 +561,32 @@ form.addEventListener('submit', async (event) => {
         // Since 'no-cors' mode is used, we cannot inspect the response directly.
         // We assume success here and proceed to book the meeting in Firebase.
         if (db && userId && appId) {
-            const meetingsRef = collection(db, 'artifacts', appId, 'public', 'data', 'bookedMeetings');
-
-            // Add the meeting booking to Firestore
-            await addDoc(meetingsRef, {
-                startTime: Timestamp.fromDate(meetingStartDateTime), // Store meeting start time as Firestore Timestamp
-                endTime: Timestamp.fromDate(meetingEndDateTime),     // Store meeting end time as Firestore Timestamp
-                bookedBy: userId, // Record the user who booked it
-                clientEmail: data.emailAddress, // Store client email for reference
-                clientName: data.fullName, // Store client name
-                orderType: data.typeOfOrder, // Store order type from the form
-                createdAt: Timestamp.now(),  // Record when the booking was created
-                durationType: data.meetingDurationType // Store the chosen duration type
+            // Write to 'bookedMeetings' (private from client reads)
+            const bookedMeetingsRef = collection(db, 'artifacts', appId, 'public', 'data', 'bookedMeetings');
+            await addDoc(bookedMeetingsRef, {
+                startTime: Timestamp.fromDate(meetingStartDateTime),
+                endTime: Timestamp.fromDate(meetingEndDateTime),
+                bookedBy: userId,
+                clientEmail: data.emailAddress,
+                clientName: data.fullName,
+                orderType: data.typeOfOrder,
+                createdAt: Timestamp.now(),
+                durationType: data.meetingDurationType
             });
-            console.log("Meeting successfully booked in Firestore:", meetingStartDateTime, meetingEndDateTime);
+            console.log("Meeting successfully booked (written) to bookedMeetings in Firestore.");
+
+            // Additionally, write a simplified entry to 'bookingDateTimes' for public availability checks
+            const bookingDateTimesRef = collection(db, 'artifacts', appId, 'public', 'data', 'bookingDateTimes');
+            await addDoc(bookingDateTimesRef, {
+                startTime: Timestamp.fromDate(meetingStartDateTime),
+                endTime: Timestamp.fromDate(meetingEndDateTime),
+                createdAt: Timestamp.now(),
+                // Keep minimal info here as it's publicly readable
+            });
+            console.log("Meeting availability slot successfully added to bookingDateTimes in Firestore.");
+
         } else {
-            console.warn("Firebase not initialized or userId/appId missing, meeting not booked in Firestore.");
+            console.warn("Firebase not initialized or userId/appId missing, meeting not fully processed in Firestore.");
         }
 
         // Populate submitted details on the success page
