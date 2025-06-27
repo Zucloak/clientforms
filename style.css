@@ -104,25 +104,42 @@ input:focus, textarea:focus, select:focus {
     }
 }
 
-/* IMPORTANT: New rules for compact date/time inputs on small screens */
-/* Ensure date/time input groups are centered and have a controlled max-width */
+/* Specific styling for date and time input fields for compact look */
 .date-time-input-group {
-    width: 100%; /* Take full width of its grid cell */
-    /* On small screens (default, before sm:), apply max-width and center */
-    max-width: 250px; /* Adjust this value as needed, e.g., 200px or 70% */
+    /* Ensure the group itself centers */
     margin-left: auto;
     margin-right: auto;
-    /* Also ensure the text inside labels/inputs is centered */
-    text-align: center;
+    /* Limit the max-width of the container for these inputs */
+    max-width: 200px; /* Adjusted to be even smaller for a snug fit */
+    text-align: center; /* Center labels */
+    flex-shrink: 0; /* Prevent shrinking below content size */
 }
 
-/* Override for larger screens (sm and up) if needed, though Tailwind's grid handles much of it */
+.date-time-input-group input[type="date"],
+.date-time-input-group input[type="time"] {
+    width: 100%; /* Make input fill its constrained parent */
+    box-sizing: border-box; /* Include padding and border in the element's total width */
+    -webkit-appearance: none; /* Remove default iOS styling */
+    -moz-appearance: none; /* Remove default Firefox styling */
+    appearance: none; /* Remove default browser styling */
+    padding-left: 0.5rem; /* Reduce padding slightly */
+    padding-right: 0.5rem; /* Reduce padding slightly */
+    text-align: center; /* Center the actual date/time text inside the input */
+}
+
+/* Override for larger screens (sm and up) to allow expansion */
 @media (min-width: 640px) {
     .date-time-input-group {
         max-width: 100%; /* Allow to expand within sm:col-span-1 or sm:col-span-2 */
         margin-left: 0;
         margin-right: 0;
         text-align: left; /* Reset text alignment for larger screens */
+    }
+    .date-time-input-group input[type="date"],
+    .date-time-input-group input[type="time"] {
+        padding-left: 0.75rem; /* Revert to standard padding on larger screens */
+        padding-right: 1rem;
+        text-align: left; /* Revert text alignment for larger screens */
     }
 }
 
