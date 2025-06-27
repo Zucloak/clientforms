@@ -21,7 +21,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- Custom CSS File -->
-    <link rel="stylesheet" href="dist/style.css">
+    <link rel="stylesheet" href="style.css">
 
     <!-- NEW: Client-side Firebase Initialization Script -->
     <!-- This script will fetch the config from your Vercel API and then initialize Firebase. -->
@@ -142,14 +142,14 @@
                 <p class="text-sm text-gray-200 text-center mb-8">All fields in this section are required.</p>
 
                 <div class="relative">
-                    <label for="typeOfOrder" class="block text-base font-medium text-gray-100 mb-2">Type of Order</label>
-                    <div id="customDropdownButton" class="mt-1 block w-full form-field cursor-pointer flex justify-between items-center" tabindex="0" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-controls="dropdownOptions">
+                    <label id="typeOfOrderLabel" for="typeOfOrder" class="block text-base font-medium text-gray-100 mb-2">Type of Order</label>
+                    <div id="customDropdownButton" class="mt-1 block w-full form-field cursor-pointer flex justify-between items-center" tabindex="0" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="typeOfOrderLabel">
                         <span id="selectedOptionText">Select Order Type</span>
                         <svg class="w-5 h-5 text-white transform transition-transform duration-200" id="dropdownArrow" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                     </div>
                     <input type="hidden" id="typeOfOrder" name="typeOfOrder" required value="">
 
-                    <ul id="dropdownOptions" class="absolute z-10 w-full mt-1 rounded-md shadow-lg overflow-hidden hidden custom-dropdown-options" role="listbox" aria-labelledby="customDropdownButton">
+                    <ul id="dropdownOptions" class="absolute z-10 w-full mt-1 rounded-md shadow-lg overflow-hidden hidden custom-dropdown-options" role="listbox" aria-labelledby="typeOfOrderLabel">
                         <li class="px-4 py-2 cursor-pointer text-white" data-value="Branding">Branding</li>
                         <li class="px-4 py-2 cursor-pointer text-white" data-value="Web Design">Web Design</li>
                         <li class="px-4 py-2 cursor-pointer text-white" data-value="Marketing Campaign">Marketing Campaign</li>
@@ -170,14 +170,14 @@
 
                 <!-- Meeting Duration Options -->
                 <div class="space-y-4">
-                    <label class="block text-base font-medium text-gray-100 mb-2">Meeting Duration</label>
+                    <label for="fixedDuration" class="block text-base font-medium text-gray-100 mb-2">Meeting Duration</label>
                     <div class="flex items-center space-x-4">
                         <label class="inline-flex items-center">
-                            <input type="radio" name="meetingDurationOption" value="fixed" class="form-radio h-4 w-4 text-purple-600" checked>
+                            <input type="radio" id="fixedDuration" name="meetingDurationOption" value="fixed" class="form-radio h-4 w-4 text-purple-600" checked>
                             <span class="ml-2 text-gray-200">1 Hour Meeting</span>
                         </label>
                         <label class="inline-flex items-center">
-                            <input type="radio" name="meetingDurationOption" value="custom" class="form-radio h-4 w-4 text-purple-600">
+                            <input type="radio" id="customDuration" name="meetingDurationOption" value="custom" class="form-radio h-4 w-4 text-purple-600">
                             <span class="ml-2 text-gray-200">Custom Duration</span>
                         </label>
                     </div>
@@ -297,6 +297,6 @@
     </div>
 
     <!-- Custom JavaScript File -->
-    <script type="module" src="dist/script.js"></script>
+    <script type="module" src="script.js"></script>
 </body>
 </html>
