@@ -137,17 +137,18 @@
                 <p class="text-sm text-gray-200 text-center mb-8">All fields in this section are required.</p>
 
                 <div class="relative">
-                    <!-- Fix: The label text is explicitly linked to the custom dropdown button via aria-labelledby.
-                         The 'for' attribute is removed as it's not applicable to the div and causes validation errors. -->
-                    <label id="typeOfOrderLabel" class="block text-base font-medium text-gray-100 mb-2">Type of Order</label>
-                    <div id="customDropdownButton" class="mt-1 block w-full form-field cursor-pointer flex justify-between items-center" tabindex="0" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="typeOfOrderLabel">
-                        <span id="selectedOptionText">Select Order Type</span>
-                        <svg class="w-5 h-5 text-white transform transition-transform duration-200" id="dropdownArrow" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                    </div>
-                    <!-- The hidden input is the actual form control for the value; kept hidden from accessibility tree -->
-                    <input type="hidden" id="typeOfOrder" name="typeOfOrder" required value="" aria-hidden="true" tabindex="-1">
+                    <!-- FIX: Label now wraps the custom dropdown button and the hidden input,
+                         creating an implicit association that resolves validation errors. -->
+                    <label class="block text-base font-medium text-gray-100 mb-2">
+                        Type of Order
+                        <div id="customDropdownButton" class="mt-1 block w-full form-field cursor-pointer flex justify-between items-center" tabindex="0" role="combobox" aria-haspopup="listbox" aria-expanded="false">
+                            <span id="selectedOptionText">Select Order Type</span>
+                            <svg class="w-5 h-5 text-white transform transition-transform duration-200" id="dropdownArrow" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </div>
+                        <input type="hidden" id="typeOfOrder" name="typeOfOrder" required value="" aria-hidden="true" tabindex="-1">
+                    </label>
 
-                    <ul id="dropdownOptions" class="absolute z-10 w-full mt-1 rounded-md shadow-lg overflow-hidden hidden custom-dropdown-options" role="listbox" aria-labelledby="typeOfOrderLabel">
+                    <ul id="dropdownOptions" class="absolute z-10 w-full mt-1 rounded-md shadow-lg overflow-hidden hidden custom-dropdown-options" role="listbox">
                         <li class="px-4 py-2 cursor-pointer text-white" data-value="Branding">Branding</li>
                         <li class="px-4 py-2 cursor-pointer text-white" data-value="Web Design">Web Design</li>
                         <li class="px-4 py-2 cursor-pointer text-white" data-value="Marketing Campaign">Marketing Campaign</li>
