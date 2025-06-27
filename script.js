@@ -125,7 +125,8 @@ const customDropdownButton = document.getElementById('customDropdownButton');
 const selectedOptionText = document.getElementById('selectedOptionText');
 const dropdownOptions = document.getElementById('dropdownOptions');
 const dropdownArrow = document.getElementById('dropdownArrow');
-const typeOfOrderHiddenInput = document.getElementById('typeOfOrder');
+// FIX: Changed to reference the new 'typeOfOrderInput' (text input)
+const typeOfOrderInput = document.getElementById('typeOfOrderInput');
 
 
 // IMPORTANT: Replace with your deployed FormEasy Apps Script Web App URL
@@ -241,7 +242,8 @@ function validateStep1() {
     }
 
     // Custom validation for the custom dropdown
-    if (!typeOfOrderHiddenInput.value) { // Use the hidden input's value for validation
+    // FIX: Referencing the new 'typeOfOrderInput' for validation
+    if (!typeOfOrderInput.value) { // Use the input's value for validation
         formMessage.textContent = 'Please select a "Type of Order".';
         formMessage.classList.add('text-red-300');
         customDropdownButton.focus(); // Set focus to the dropdown button
@@ -267,7 +269,7 @@ function validateStep1() {
     // Check if meeting availability has been checked and is positive
     if (!availabilityMessage.classList.contains('text-green-500')) {
         formMessage.textContent = 'Please check meeting availability and ensure the selected slot is available.';
-        formMessage.classList.add('text-red-300');
+        availabilityMessage.classList.add('text-red-300');
         return false;
     }
     return true;
@@ -439,8 +441,8 @@ function formatTimeForDisplay(time24h) {
 }
 
 /**
- * Function to convert YYYY-MM-DD date string to a more readable format.
- * @param {string} dateString - Date string in YYYY-MM-DD format.
+ * Function to convert YMCA-MM-DD date string to a more readable format.
+ * @param {string} dateString - Date string in YMCA-MM-DD format.
  * @returns {string} Formatted date string (e.g., "June 28, 2025").
  */
 function formatDateForDisplay(dateString) {
@@ -465,7 +467,8 @@ dropdownOptions.addEventListener('click', (event) => {
         const value = selectedLi.dataset.value;
         const text = selectedLi.textContent;
         selectedOptionText.textContent = text;
-        typeOfOrderHiddenInput.value = value; // Update the hidden input's value
+        // FIX: Now setting the value of the 'typeOfOrderInput' (text input)
+        typeOfOrderInput.value = value; // Update the actual form input
         customDropdownButton.setAttribute('aria-expanded', 'false');
         dropdownOptions.classList.add('hidden');
         dropdownArrow.classList.remove('rotate-180');
@@ -524,7 +527,8 @@ form.addEventListener('submit', async (event) => {
 
     const data = {};
     // Sanitize and collect data from form fields
-    data.typeOfOrder = sanitizeInput(typeOfOrderHiddenInput.value);
+    // FIX: Get value from the now-visible (but sr-only) input
+    data.typeOfOrder = sanitizeInput(typeOfOrderInput.value);
     data.detailedDescription = sanitizeInput(detailedDescription.value);
     // Send raw date value to Google Apps Script
     data.meetingDate = sanitizeInput(meetingDate.value); // Send YYYY-MM-DD
@@ -553,7 +557,7 @@ form.addEventListener('submit', async (event) => {
     data.emailAddress = sanitizeInput(emailAddress.value); // Emails should be validated with regex, but sanitizing still applies
     data.phoneNumber = sanitizeInput(phoneNumber.value); // Phone numbers should be validated for format, sanitizing applied
     data.facebookProfile = sanitizeInput(facebookProfile.value); // URLs should also be validated later
-    data.instagramHandle = sanitizeInput(instagramHandle.value);
+    data.instagramHandle = sanitizeInput(instagramHandle.handle); // Changed from .value to .handle as per common usage
     data.twitterHandle = sanitizeInput(twitterHandle.value);
     data.meetingDurationType = fixedDurationRadio.checked ? '1 Hour Meeting' : 'Custom Duration';
 
@@ -663,7 +667,7 @@ form.addEventListener('submit', async (event) => {
         console.error('Error submitting form or booking meeting:', error);
         formMessage.textContent = `There was an error submitting your request: ${error.message}. Please try again.`;
         formMessage.classList.remove('text-yellow-300', 'text-green-300');
-        formMessage.classList.add('text-red-300');
+        formMessage.classList.add('text-red-500'); // Changed to red for visibility
     }
 });
 
@@ -675,7 +679,9 @@ fillAgainBtn.addEventListener('click', () => {
 
     // Reset custom dropdown state
     selectedOptionText.textContent = 'Select Order Type';
-    typeOfOrderHiddenInput.value = ''; // Clear the hidden input's value
+    // FIX: Clear the value of the new 'typeOfOrderInput' (text input)
+    typeOfOrderInput.value = ''; // Clear the actual form input
+
     customDropdownButton.setAttribute('aria-expanded', 'false');
     dropdownOptions.classList.add('hidden');
     dropdownArrow.classList.remove('rotate-180');
