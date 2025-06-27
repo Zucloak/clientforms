@@ -430,7 +430,7 @@ checkAvailabilityBtn.addEventListener('click', async () => {
 /**
  * Function to convert 24-hour time to 12-hour AM/PM format.
  * @param {string} time24h - Time string in HH:MM format (24-hour).
- * @returns {string} Formatted time string (e.g., "04:15 PM").
+ * @returns {string} Formatted time string for sheets (e.g., "'04:15 PM").
  */
 function formatTimeForDisplay(time24h) {
     if (!time24h) return '';
@@ -442,8 +442,8 @@ function formatTimeForDisplay(time24h) {
 }
 
 /**
- * Function to convert YMCA-MM-DD date string to a more readable format.
- * @param {string} dateString - Date string in YMCA-MM-DD format.
+ * Function to convert YYYY-MM-DD date string to a more readable format.
+ * @param {string} dateString - Date string in YYYY-MM-DD format.
  * @returns {string} Formatted date string (e.g., "June 28, 2025").
  */
 function formatDateForDisplay(dateString) {
@@ -550,7 +550,7 @@ form.addEventListener('submit', async (event) => {
         meetingEndDateTime = new Date(`${selectedDate}T${endTimeValue}:00`);
     }
 
-    // FIX: Convert to 12-hour format with AM/PM before sending to Google Sheets
+    // Convert to 12-hour format with AM/PM before sending to Google Sheets
     data.meetingStartTime = sanitizeInput(formatTimeForDisplay(startTimeValue));
     data.meetingEndTime = sanitizeInput(formatTimeForDisplay(meetingEndDateTime.toTimeString().substring(0, 5)));
 
@@ -628,17 +628,24 @@ form.addEventListener('submit', async (event) => {
             twitterHandle: 'Twitter/X Handle'
         };
 
-        // Create a temporary object for display purposes, applying formatting
-        const displayData = { ...data }; // Start with a copy of the raw data
-        displayData.meetingDate = formatDateForDisplay(data.meetingDate);
-        displayData.meetingStartTime = formatTimeForDisplay(data.meetingStartTime);
-        // Only format end time if it was actually provided (for custom duration)
-        if (customDurationRadio.checked) {
-             displayData.meetingEndTime = formatTimeForDisplay(data.meetingEndTime);
-        } else {
-             displayData.meetingEndTime = "N/A (1 Hour Meeting)"; // Or hide it, depending on preference
-        }
+        // **FIX STARTS HERE**
+        // Create a temporary object for display purposes. The `data` object already contains
+        // the correctly formatted time strings (e.g., "'04:30 PM'"). The issue was calling
+        // `formatTimeForDisplay` again on these already-formatted strings, which corrupted them.
+        // The fix is to simply use the values from `data` and remove the leading single quote,
+        // which is only needed for Google Sheets.
+        const displayData = { ...data };
+        displayData.meetingDate = formatDateForDisplay(data.meetingDate); // Format the date for display
 
+        // For time, remove the sheet-specific quote character for clean display. Do not re-format.
+        displayData.meetingStartTime = data.meetingStartTime ? data.meetingStartTime.replace(/'/g, '') : '';
+        
+        if (customDurationRadio.checked) {
+             displayData.meetingEndTime = data.meetingEndTime ? data.meetingEndTime.replace(/'/g, '') : '';
+        } else {
+             displayData.meetingEndTime = "N/A (1 Hour Meeting)";
+        }
+        // **FIX ENDS HERE**
 
         for (const key in displayData) { // Loop through the displayData
             if (displayData.hasOwnProperty(key) && displayData[key] && displayData[key] !== "N/A (1 Hour Meeting)") {
