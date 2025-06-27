@@ -627,16 +627,10 @@ form.addEventListener('submit', async (event) => {
             instagramHandle: 'Instagram Handle',
             twitterHandle: 'Twitter/X Handle'
         };
-
-        // Create a temporary object for display purposes. The `data` object already contains
-        // the correctly formatted time strings (e.g., "'04:30 PM'"). The issue was calling
-        // `formatTimeForDisplay` again on these already-formatted strings, which corrupted them.
-        // The fix is to simply use the values from `data` and remove the leading single quote,
-        // which is only needed for Google Sheets.
+        
         const displayData = { ...data };
-        displayData.meetingDate = formatDateForDisplay(data.meetingDate); // Format the date for display
+        displayData.meetingDate = formatDateForDisplay(data.meetingDate); 
 
-        // For time, remove the sheet-specific quote character for clean display. Do not re-format.
         displayData.meetingStartTime = data.meetingStartTime ? data.meetingStartTime.replace(/'/g, '') : '';
         
         if (customDurationRadio.checked) {
@@ -645,23 +639,20 @@ form.addEventListener('submit', async (event) => {
              displayData.meetingEndTime = "N/A (1 Hour Meeting)";
         }
 
-        for (const key in displayData) { // Loop through the displayData
+        for (const key in displayData) { 
             if (displayData.hasOwnProperty(key) && displayData[key] && displayData[key] !== "N/A (1 Hour Meeting)") {
                 const label = fieldLabels[key] || key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
                 detailsHtml += `<p class="mb-2"><span class="font-bold text-amber-200">${label}:</span> ${displayData[key]}</p>`;
             }
         }
         
-        // Add a creative and professional marketing message
-        detailsHtml += `<hr class="my-6 border-purple-400 opacity-30">`; // A subtle separator
-        detailsHtml += `<div class="mt-4 text-center">
-            <p class="text-amber-100 text-sm">
-                <span class="font-bold">A Pro Tip:</span> Punctuality pays off! Arrive a few minutes early to our scheduled meeting, and you might unlock an exclusive deal. We look forward to connecting with you.
-            </p>
-        </div>`;
-        
         submittedDetailsDiv.innerHTML = detailsHtml;
 
+        // UPDATE: Show the marketing tip div that is already in the HTML
+        const marketingTipDiv = document.getElementById('marketingTip');
+        if (marketingTipDiv) {
+            marketingTipDiv.classList.remove('hidden');
+        }
 
         // Hide the form container and show the success message container
         formContainer.classList.add('hidden');
@@ -695,7 +686,6 @@ fillAgainBtn.addEventListener('click', () => {
 
     // Reset custom dropdown state
     selectedOptionText.textContent = 'Select Order Type';
-    // FIX: Clear the value of the new 'typeOfOrderInput' (text input)
     typeOfOrderInput.value = ''; // Clear the actual form input
 
     customDropdownButton.setAttribute('aria-expanded', 'false');
@@ -708,6 +698,12 @@ fillAgainBtn.addEventListener('click', () => {
     meetingEndTimeGroup.classList.add('hidden');
     meetingEndTime.removeAttribute('required');
     meetingEndTime.value = '';
+
+    // UPDATE: Hide the marketing tip when resetting
+    const marketingTipDiv = document.getElementById('marketingTip');
+    if (marketingTipDiv) {
+        marketingTipDiv.classList.add('hidden');
+    }
 
     showStep(0); // Go back to the first step (Step 0)
     availabilityMessage.textContent = ''; // Clear availability message
