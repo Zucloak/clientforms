@@ -21,20 +21,19 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- Custom CSS File -->
-    <link rel="stylesheet" href="dist/style.css">
+    <link rel="stylesheet" href="style.css">
 
-    <!-- Firebase SDK Initialization: This module will set global window.db, window.userId etc. -->
-    <!-- Corrected path based on your file structure image -->
-    <script type="module" src="api/firebase-config.js"></script>
+    <!-- NEW: Client-side Firebase Initialization Script -->
+    <!-- This script will fetch the config from your Vercel API and then initialize Firebase. -->
+    <script type="module" src="firebase-init-client.js"></script>
 </head>
 <body class="flex flex-col items-center justify-center min-h-screen p-4 sm:p-6 md:p-8">
     <!-- Firebase Status Indicator -->
-    <!-- Hidden by default, shown only when status changes -->
     <div id="firebaseStatus" class="mb-4 text-center text-sm font-medium hidden">
         Connecting to Forms...
     </div>
 
-    <!-- Main form container with responsive styling and background -->
+    <!-- Main form container -->
     <div id="formContainer" class="w-full form-container-responsive mx-auto bg-purple-900 bg-opacity-70 rounded-xl shadow-2xl p-6 sm:p-10 space-y-8">
         <h1 class="text-4xl sm:text-5xl font-extrabold text-white text-center mb-6 drop-shadow-lg">SYNAPPSE Order Request</h1>
 
@@ -298,6 +297,6 @@
     </div>
 
     <!-- Custom JavaScript File -->
-    <script type="module" src="dist/script.js"></script>
+    <script type="module" src="script.js"></script>
 </body>
 </html>
