@@ -437,7 +437,8 @@ function formatTimeForDisplay(time24h) {
     const [hours, minutes] = time24h.split(':').map(Number);
     const period = hours >= 12 ? 'PM' : 'AM';
     const formattedHours = hours % 12 || 12; // Convert 0 (midnight) to 12 AM, and hours > 12 to 12-hour format
-    return `${formattedHours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')} ${period}`;
+    // FIX: Prepend a single quote to force Google Sheets to treat this as literal text
+    return `'${formattedHours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')} ${period}`;
 }
 
 /**
